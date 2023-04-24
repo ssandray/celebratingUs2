@@ -32,7 +32,7 @@
 
 # Platform project
 /linux/
-/android/
+# /android/
 /ios/
 /macos/
 /web/sqflite_sw.js
