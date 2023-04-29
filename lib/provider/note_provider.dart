@@ -1,9 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 
 import '../model/model.dart';
 import '../model/model_constant.dart';
+
+//for CSV ?
+import 'dart:async';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'package:csv/csv.dart';
+import '../model/nameday_constant.dart';
 
 DbNote snapshotToNote(Map<String, Object?> snapshot) {
   return DbNote()..fromMap(snapshot);
@@ -65,9 +73,18 @@ class DbNoteProvider {
         return db;
       });
 
+
+//GET CELEBRATION FROM ID
   Future<DbNote?> getNote(int? id) async {
     var list = (await db!.query(tableNotes,
-        columns: [columnId, columnTitle, columnContent, columnUpdated, columnDate, columnType],
+        columns: [
+          columnId,
+          columnTitle,
+          columnContent,
+          columnUpdated,
+          columnDate,
+          columnType
+        ],
         where: '$columnId = ?',
         whereArgs: <Object?>[id]));
     if (list.isNotEmpty) {
@@ -76,12 +93,15 @@ class DbNoteProvider {
     return null;
   }
 
+//CREATE TABLES
   Future _createDb(Database db) async {
     await db.execute('DROP TABLE If EXISTS $tableNotes');
     await db.execute(
         'CREATE TABLE $tableNotes($columnId INTEGER PRIMARY KEY, $columnTitle TEXT, $columnContent TEXT, $columnUpdated INTEGER, $columnDate INTEGER, $columnType TEXT)');
     await db
         .execute('CREATE INDEX NotesUpdated ON $tableNotes ($columnUpdated)');
+    await _createNamedayTable(db);
+    //SAMPLE DATA
     await _saveNote(
         db,
         DbNote()
@@ -89,7 +109,7 @@ class DbNoteProvider {
           ..content.v = 'grāmata par ceļojumiem'
           ..date.v = 1
           ..specialday.v = 1687622400000
-          ..type.v = 'nameday'); 
+          ..type.v = 'nameday');
     await _saveNote(
         db,
         DbNote()
@@ -97,7 +117,7 @@ class DbNoteProvider {
           ..content.v = 'biļetes uz koncertu'
           ..date.v = 2
           ..specialday.v = 1690310400000
-          ..type.v = 'nameday');  
+          ..type.v = 'nameday');
     _triggerUpdate();
   }
 
@@ -107,7 +127,7 @@ class DbNoteProvider {
 
   Future<String> fixPath(String path) async => path;
 
-  /// Add or update a note
+  /// ADD or UPDATE CELEBRATION
   Future _saveNote(DatabaseExecutor? db, DbNote updatedNote) async {
     if (updatedNote.id.v != null) {
       await db!.update(tableNotes, updatedNote.toMap(),
@@ -190,7 +210,7 @@ class DbNoteProvider {
     return ctlr.stream;
   }
 
-  /// Don't read all fields
+  /// GET ALL SAVED CELEBRATIONS
   Future<DbNotes> getListNotes(
       {int? offset, int? limit, bool? descending}) async {
     // devPrint('fetching $offset $limit');
@@ -214,4 +234,45 @@ class DbNoteProvider {
   Future deleteDb() async {
     await dbFactory.deleteDatabase(await fixPath(dbName));
   }
+
+
+//parse CSV and write to table
+  Future<void> _createNamedayTable(Database db) async {
+    await db.execute('DROP TABLE IF EXISTS $tableNameday');
+    await db.execute(
+        'CREATE TABLE $tableNameday($colId INTEGER PRIMARY KEY, $colDate TEXT, $colName TEXT)');
+    final csvString = await rootBundle.loadString('assets/varda_dienas.csv');
+    final lines = csvString.split('\n');
+    final namedays = <Nameday>[];
+    for (final line in lines) {
+      final fields = line.split(',');
+      if (fields.length == 2) {
+        final date = fields[0];
+        final name = fields[1];
+        namedays.add(Nameday(date: date, name: name));
+      }
+    }
+    for (final nameday in namedays) {
+      await db.rawInsert(
+          'INSERT INTO $tableNameday($colDate, $colName) VALUES (?, ?)',
+          [nameday.date, nameday.name]);
+    }
+  }
+
+//GET nameday for date selected
+Future<String?> getNameday(String date) async {
+  var result = await db?.query(tableNameday,
+      columns: [colName],
+      where: 'colDate = ?',
+      whereArgs: [date]);
+
+  if (result != null && result.isNotEmpty) {
+    return result.first[colName] as String?;
+  } else {
+    return null;
+  }
+}
+  
+
+  
 }

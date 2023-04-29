@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _children = [
-    TableEvents(), //calendar view
+    TableEvents(noteProvider: noteProvider), //calendar view
     NoteListPage(),
     Placeholder(),
   ];
