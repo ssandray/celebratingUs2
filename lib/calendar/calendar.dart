@@ -33,7 +33,7 @@ class _TableEventsState extends State<TableEvents> {
   
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  
+  String? _namedaysText;
   //
  
 
@@ -41,12 +41,15 @@ class _TableEventsState extends State<TableEvents> {
     db = noteProvider.db!;
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    _namedaysText = '';
+
+    _updateSelectedDay(_selectedDay!, _focusedDay, true);
   }
 
   @override
   void initState() {
     super.initState();
-    db.init(); // initialize the database object
+    //db.init(); // initialize the database object
   }
 
 
@@ -55,9 +58,6 @@ class _TableEventsState extends State<TableEvents> {
     _selectedEvents.dispose();
     super.dispose();
   }
-  //
-
-
 
   // @override
   // void initState() {
@@ -80,57 +80,41 @@ class _TableEventsState extends State<TableEvents> {
     return kEvents[day] ?? []; //nomainīt
   }
 
-//GET NAMEDAY
-Future<String?> getNameday(String date) async {
-  DateTime selectedDay = DateFormat('dd.MM.').parse(date); // format date string
-  String formattedDate = DateFormat('dd.MM.').format(selectedDay); 
+  Future<String?> getNameday(DateTime datetime) async {
+    final formattedDate = DateFormat('dd.MM.').format(datetime);
+    final result = await noteProvider.getNameday(formattedDate);
 
-  var query = await db.query(tableNameday,
-      columns: [colName],
-      where: '$colDate = ?',
-      whereArgs: [formattedDate]) as List<Map<String, dynamic>>;
-
-  if (query.isNotEmpty) {
-    return query.first[colName] as String?;
-  } else {
-    return null;
+    print("namedays loaded:" + result!);
+    return result;
   }
-}
+
   //GET NAMEDAYS and EVENTS for selected
-void _onDaySelected(DateTime selectedDay, DateTime focusedDay) async {
-  if (!isSameDay(_selectedDay, selectedDay)) {
-    setState(() {
-      _selectedDay = selectedDay;
-      _focusedDay = focusedDay;
-    });
-
-  
-   String formattedDate = DateFormat('dd.MM.').format(selectedDay);
-    final nameDay = await getNameday(formattedDate); // get nameday from database
-    final events = _getEventsForDay(selectedDay); // get events for selected day
-    
-    // perform any desired operations with the retrieved data (e.g. display in UI)
-    print('Selected day: $selectedDay, Nameday: $nameDay, Events: $events');
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) async {
+    _updateSelectedDay(selectedDay, focusedDay, false);
   }
-}
 
+  void _updateSelectedDay(DateTime selectedDay, DateTime focusedDay, bool forceUpdate) async {
+    if (!isSameDay(_selectedDay, selectedDay) || forceUpdate) {
+      final nameDays = await getNameday(selectedDay); // get nameday from database
+      final events = _getEventsForDay(selectedDay); // get events for selected day
 
-  // void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-  //   if (!isSameDay(_selectedDay, selectedDay)) {
-  //     setState(() {
-  //       _selectedDay = selectedDay;
-  //       _focusedDay = focusedDay;
-  //     });
+      setState(() {
+        _selectedDay = selectedDay;
+        _focusedDay = focusedDay;
+        _namedaysText = nameDays;
+      });
 
-  //     _selectedEvents.value = _getEventsForDay(selectedDay);
-  //   }
-  // }
+      // perform any desired operations with the retrieved data (e.g. display in UI)
+      print('Selected day: $selectedDay, Nameday: $nameDays, Events: $events');
+    } else {
+      print('Selected day is same as before!');
+    }
+  }
 
-
-Map<CalendarFormat, String> availableCalendarFormats = {         //define calendar views
-  CalendarFormat.month: 'Week',
-  CalendarFormat.week: 'Month',
-};
+  Map<CalendarFormat, String> availableCalendarFormats = {         //define calendar views
+    CalendarFormat.month: 'Week',
+    CalendarFormat.week: 'Month',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -146,8 +130,7 @@ Map<CalendarFormat, String> availableCalendarFormats = {         //define calend
               calendarFormat: _calendarFormat,
               eventLoader: _getEventsForDay,
               startingDayOfWeek: StartingDayOfWeek.monday,
-              calendarStyle: CalendarStyle(                // Use `CalendarStyle` to customize the UI
-                
+              calendarStyle: const CalendarStyle(// Use `CalendarStyle` to customize the UI
                 outsideDaysVisible: false,
                 tableBorder: TableBorder(bottom: BorderSide(color: Colors.orange, style: BorderStyle.solid)),
                 tablePadding: EdgeInsets.only(bottom: 10)
@@ -175,7 +158,7 @@ Map<CalendarFormat, String> availableCalendarFormats = {         //define calend
             decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.0), color: Colors.orange
                         ),
-                        child: Text(getNameday.toString()),
+                        child: Text(_namedaysText.toString()),
                         ),
             Container(child: Text('Celebrations'),alignment: Alignment.centerLeft, padding: EdgeInsets.only(left: 20, top: 20)), 
             Container(
