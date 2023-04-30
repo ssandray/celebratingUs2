@@ -241,7 +241,12 @@ class DbNoteProvider {
     await db.execute('DROP TABLE IF EXISTS $tableNameday');
     await db.execute(
         'CREATE TABLE $tableNameday($colId INTEGER PRIMARY KEY, $colDate TEXT, $colName TEXT)');
-    final csvString = await rootBundle.loadString('assets/varda_dienas.csv');
+    var csvString = await rootBundle.loadString('assets/varda_dienas.csv');
+    // print("namedays csv string: $csvString");
+    // Clean up nameday csv - remove any quotes and empty space
+    csvString = csvString.replaceAll(RegExp('"'), '');
+    csvString = csvString.replaceAll(RegExp(' '), '');
+
     final lines = csvString.split('\n');
     final namedays = <Nameday>[];
     for (final line in lines) {
@@ -250,28 +255,46 @@ class DbNoteProvider {
         final date = fields[0];
         final name = fields[1];
         namedays.add(Nameday(date: date, name: name));
+      } else {
+        // If there are more than 1 nameday for the date, we have to add them all
+        for (final field in fields) {
+          if (field != fields[0]) {
+            namedays.add(Nameday(date: fields[0], name: field));
+          }
+        }
       }
     }
+
     for (final nameday in namedays) {
-      await db.rawInsert(
+      final insertedId = await db.rawInsert(
           'INSERT INTO $tableNameday($colDate, $colName) VALUES (?, ?)',
           [nameday.date, nameday.name]);
+      //print("inserted value ${nameday.date}, ${nameday.name} into nameday database, id = $insertedId");
     }
+    print("inserted ${namedays.length} lines into nameday database");
   }
 
 //GET nameday for date selected
 Future<String?> getNameday(String date) async {
   var result = await db?.query(tableNameday,
       columns: [colName],
-      where: 'colDate = ?',
+      where: '$colDate = ?',
       whereArgs: [date]);
 
   if (result != null && result.isNotEmpty) {
-    return result.first[colName] as String?;
+    final List<String> resultList = [];
+    for (final line in result) {
+      resultList.add(line[colName] as String);
+    }
+
+    return resultList.join(', ');
+    //return result.first[colName] as String?;
   } else {
     return null;
   }
 }
+
+
   
 
   
