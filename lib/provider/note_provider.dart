@@ -221,6 +221,71 @@ class DbNoteProvider {
         offset: offset));
     return DbNotes(list);
   }
+ // GET CELEBRATIONS FOR DATE SELECTED
+  //  Future<DbNotes> getEventsForDay(DateTime date) async {
+  //   var list = (await db!.query(tableNotes,
+  //       columns: [columnId, columnTitle, columnContent, columnDate, columnType],
+  //       where: '$columnDate = ?',
+  //       whereArgs: [date],
+  //       //orderBy: '$columnDate ${(descending ?? true) ? 'ASC' : 'DESC'}',
+  //       //limit: limit,
+  //       //offset: offset
+  //       ));
+  //   return DbNotes(list);
+  // }
+// Future<List<DbNote>> getEventsForDay(DateTime selectedDate) async {
+//   final startOfSelectedDay =
+//       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+//   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
+
+//   final results = await db!.query(
+//     tableNotes,
+//     where: '$columnDate >= ? AND $columnDate < ?',
+//     whereArgs: [
+//       startOfSelectedDay.millisecondsSinceEpoch,
+//       endOfSelectedDay.millisecondsSinceEpoch
+//     ],
+//   );
+
+//   return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+// }
+// Future<List<DbNote>?> getEventsForDay(DateTime selectedDate) async {
+//   final startOfSelectedDay =
+//       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+//   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
+
+//   final results = await db!.query(
+//     tableNotes,
+//     where: '$columnDate >= ? AND $columnDate < ?',
+//     whereArgs: [
+//       startOfSelectedDay.millisecondsSinceEpoch,
+//       endOfSelectedDay.millisecondsSinceEpoch
+//     ],
+//   );
+
+//   if (results.isEmpty) {
+//     return null;
+//   }
+
+//   return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+// }
+Future<List<DbNote>> getEventsForDay(DateTime selectedDate) async {
+  final startOfSelectedDay =
+      DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+  final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
+
+  final results = await db!.query(
+    tableNotes,
+    where: '$columnDate >= ? AND $columnDate < ?',
+    whereArgs: [
+      startOfSelectedDay.millisecondsSinceEpoch,
+      endOfSelectedDay.millisecondsSinceEpoch
+    ],
+  );
+
+  return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+}
+
 
   Future clearAllNotes() async {
     await db!.delete(tableNotes);

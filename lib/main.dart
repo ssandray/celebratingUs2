@@ -11,6 +11,8 @@ import 'calendar/calendar.dart';
 import './page/edit_page.dart';
 import './page/list_page.dart';
 import './provider/note_provider.dart';
+import './page/settings_page.dart';
+import 'package:flutter/services.dart';
 
 late DbNoteProvider noteProvider;
 
@@ -28,6 +30,10 @@ Future main() async {
   noteProvider = DbNoteProvider(databaseFactory);
   // devPrint('/notepad Starting');
   await noteProvider.ready;
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,      //LOCK to PORTRAIT MODE
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MyApp());
 }
 
@@ -43,7 +49,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
       ),
       home: MyHomePage(
-        title: 'Celebrating Us',
+        title: 'Celebrating Us', //HEADER TITLE
       ),
     );
   }
@@ -79,9 +85,19 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           centerTitle: true,
           title: Text(widget.title),
-          //POGAS AUGŠĀ
+          //HEADER BUTTONS
           actions: <Widget>[
-            IconButton(onPressed: () {}, icon: Icon(Icons.settings)),
+            IconButton(
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                  // This code will be executed when the settings screen is popped
+                  // Refresh the screen to reflect any changes made in the settings
+                  setState(() {});
+                },
+                icon: Icon(Icons.settings)),
           ],
         ),
         body: _children[_currentIndex],
@@ -95,12 +111,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ]),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () {_showPopupDialog(context);}
-        )
-        );
+            child: Icon(Icons.add),
+            onPressed: () {
+              _showPopupDialog(context);
+            }));
   }
-void _showPopupDialog(BuildContext context) {
+
+  void _showPopupDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -112,44 +129,55 @@ void _showPopupDialog(BuildContext context) {
             child: Column(
               children: [
                 ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.pink), ),
-                  onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return EditNotePage(
-              initialNote: null,
-            );
-          })).then((value) => Navigator.pop(context));
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.pink),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return EditNotePage(
+                        initialNote: null,
+                      );
+                    })).then((value) => Navigator.pop(context));
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.coffee), 
+                      Icon(Icons.coffee),
                       SizedBox(width: 8),
                       Text('Name day'),
                     ],
                   ),
                 ),
                 ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), ),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.blue),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                     // TODO: Implement logic for  button
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.cake), 
+                      Icon(Icons.cake),
                       SizedBox(width: 8),
                       Text('Birthday'),
                     ],
                   ),
                 ),
                 ElevatedButton(
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.green), ),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.green),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                     // TODO: Implement logic for  button
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.celebration), 
+                      Icon(Icons.celebration),
                       SizedBox(width: 8),
                       Text('Anniversary'),
                     ],
@@ -163,5 +191,3 @@ void _showPopupDialog(BuildContext context) {
     );
   }
 }
-  
-

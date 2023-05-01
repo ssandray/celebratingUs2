@@ -7,7 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 
-import './utils.dart';
+//import './utils.dart';
 import '../page/list_page.dart';
 import '../provider/note_provider.dart';
 import '../model/nameday_constant.dart';
@@ -18,6 +18,7 @@ import '../main.dart';
 
 class TableEvents extends StatefulWidget {
    final DbNoteProvider noteProvider;
+   
    const TableEvents({Key? key, required this.noteProvider}) : super(key: key);
 
    
@@ -28,7 +29,9 @@ class TableEvents extends StatefulWidget {
 class _TableEventsState extends State<TableEvents> {
   late final DbNoteProvider noteProvider;
   late final Database db;
-  late final ValueNotifier<List<Event>> _selectedEvents;
+  //late final ValueNotifier<List<Event>> _selectedEvents;
+  // late final ValueNotifier<List<DbNote>> _selectedEvents;
+   late final ValueNotifier<List<DbNote>> _selectedEvents = ValueNotifier([]);
   CalendarFormat _calendarFormat = CalendarFormat.month;   //DEFAULT CALENDAR VIEW
   
   DateTime _focusedDay = DateTime.now();
@@ -40,7 +43,7 @@ class _TableEventsState extends State<TableEvents> {
  _TableEventsState(this.noteProvider) {
     db = noteProvider.db!;
     _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+   // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
     _namedaysText = '';
 
     _updateSelectedDay(_selectedDay!, _focusedDay, true);
@@ -49,7 +52,6 @@ class _TableEventsState extends State<TableEvents> {
   @override
   void initState() {
     super.initState();
-    //db.init(); // initialize the database object
   }
 
 
@@ -59,32 +61,25 @@ class _TableEventsState extends State<TableEvents> {
     super.dispose();
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   _selectedDay = _focusedDay;
-  //   _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-  // }
-
-  // @override
-  // void dispose() {
-  //   _selectedEvents.dispose();
-  //   super.dispose();
-  // }
-
 //GET EVENTS FOR DAY SELECTED
-  List<Event> _getEventsForDay(DateTime day) {
-    
-    // Implementation example - LIST OF SAVED EVENTS
-    return kEvents[day] ?? []; //nomainīt
-  }
+// List<Event> _getEventsForDay(DateTime day) { 
+//     // Implementation example - LIST OF SAVED EVENTS
+//     return kEvents[day] ?? []; //nomainīt
+//   }
 
+ Future<List<DbNote>> _getEventsForDay(DateTime dateTime) async {
+  List<DbNote> list= await noteProvider.getEventsForDay(dateTime);
+  //final list = await noteProvider.getEventsForDay(dateTime);
+  return list;
+}
+
+
+//GET NAMEDAYS FOR DAY SELECTED
   Future<String?> getNameday(DateTime datetime) async {
     final formattedDate = DateFormat('dd.MM.').format(datetime);
     final result = await noteProvider.getNameday(formattedDate);
 
-    print("namedays loaded:" + result!);
+    print('namedays loaded:' + result!);
     return result;
   }
 
@@ -96,7 +91,7 @@ class _TableEventsState extends State<TableEvents> {
   void _updateSelectedDay(DateTime selectedDay, DateTime focusedDay, bool forceUpdate) async {
     if (!isSameDay(_selectedDay, selectedDay) || forceUpdate) {
       final nameDays = await getNameday(selectedDay); // get nameday from database
-      final events = _getEventsForDay(selectedDay); // get events for selected day
+      final events = await _getEventsForDay(selectedDay); // get events for selected day
 
       setState(() {
         _selectedDay = selectedDay;
@@ -116,19 +111,25 @@ class _TableEventsState extends State<TableEvents> {
     CalendarFormat.week: 'Month',
   };
 
+  
+
   @override
   Widget build(BuildContext context) {
+final kToday = DateTime.now();
+final kFirstDay = DateTime(kToday.year, kToday.month - 3, kToday.day);
+final kLastDay = DateTime(kToday.year, kToday.month + 3, kToday.day);
     return Container(
         child: Column(
           children: [
-            TableCalendar<Event>(
+            TableCalendar<DbNote>(
+              calendarBuilders: CalendarBuilders(), //customize icons for events
               firstDay: kFirstDay,
               lastDay: kLastDay,
               focusedDay: _focusedDay,
               selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
               availableCalendarFormats: availableCalendarFormats,
               calendarFormat: _calendarFormat,
-              eventLoader: _getEventsForDay,
+             //eventLoader: _getEventsForDay,                          //HOW TO FIX THIS ERROR
               startingDayOfWeek: StartingDayOfWeek.monday,
               calendarStyle: const CalendarStyle(// Use `CalendarStyle` to customize the UI
                 outsideDaysVisible: false,
@@ -151,7 +152,9 @@ class _TableEventsState extends State<TableEvents> {
             //LIST FOR DATE SELECTED
             const SizedBox(height: 8.0),
             Container(alignment: Alignment.centerLeft, padding: EdgeInsets.only(left: 20), 
-            child: Text(DateFormat('EEEE, dd.MM.yyyy').format(_selectedDay!))),
+            child: Text(DateFormat('EEEE, dd MMM, yyyy').format(_selectedDay!))),
+
+            //Namedays for selected
             Container(alignment: Alignment.centerLeft, 
             padding: EdgeInsets.only(left: 20, top: 10, bottom: 10), 
             margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -160,6 +163,8 @@ class _TableEventsState extends State<TableEvents> {
                         ),
                         child: Text(_namedaysText.toString()),
                         ),
+
+            //Celebrations for selected
             Container(child: Text('Celebrations'),alignment: Alignment.centerLeft, padding: EdgeInsets.only(left: 20, top: 20)), 
             Container(
               height: 211,
@@ -167,36 +172,37 @@ class _TableEventsState extends State<TableEvents> {
             
             //EVENT LIST FOR SELECTED
 
-            // Expanded(
-            //   child: 
-            //   ValueListenableBuilder<List<Event>>(
-            //     valueListenable: _selectedEvents,
-            //     builder: (context, value, _) {
-            //       return ListView.builder(
-            //         itemCount: value.length,
-            //         itemBuilder: (context, index) {
-            //           return Container(
-            //             margin: const EdgeInsets.symmetric(
-            //               horizontal: 12.0, 
-            //               vertical: 4.0,
-            //             ),
-            //             decoration: BoxDecoration(
-            //               border: Border.all(),
-            //               borderRadius: BorderRadius.circular(12.0),
-            //             ),
-            //             child: ListTile(
-            //               onTap: () => print('${value[index]}'),
-            //               title: Text('${value[index]}'),
-            //             ),
-            //           );
-            //         },
-            //       );
-            //     },
-            //   ),
-            // ),
+            Expanded(
+              child: 
+              ValueListenableBuilder<List<DbNote>>(
+                valueListenable: _selectedEvents,
+                builder: (context, value, _) {
+                  return ListView.builder(
+                    itemCount: value.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12.0, 
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: ListTile(
+                          onTap: () => print('${value[index]}'),
+                          title: Text('${value[index]}'),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
             
           ],
         ),
     );
   }
+  
 }
