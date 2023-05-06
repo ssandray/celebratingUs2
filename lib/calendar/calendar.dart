@@ -116,8 +116,8 @@ class _TableEventsState extends State<TableEvents> {
   @override
   Widget build(BuildContext context) {
 final kToday = DateTime.now();
-final kFirstDay = DateTime(kToday.year, kToday.month - 3, kToday.day);
-final kLastDay = DateTime(kToday.year, kToday.month + 3, kToday.day);
+final kFirstDay = DateTime(kToday.year, kToday.month - 10, kToday.day);
+final kLastDay = DateTime(kToday.year, kToday.month + 10, kToday.day);
     return Container(
         child: Column(
           children: [
