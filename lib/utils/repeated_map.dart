@@ -22,7 +22,8 @@ List<DbEvent> repeatEvent(DbEvent event) {
   for (int i = 1; i <= 10; i++) {
     final newDate = date.add(Duration(days: 365 * i));
     final newEvent = DbEvent()
-      ..title.v = event.title.v
+      ..firstName.v = event.firstName.v
+      ..lastName.v = event.lastName.v
       ..ideas.v = event.ideas.v
       ..date.v = event.date.v
       ..specialday.v = formatter.format(newDate)

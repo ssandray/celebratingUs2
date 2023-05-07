@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _children = [
     TableEvents(eventsProvider: eventsProvider), //calendar view
-    NoteListPage(),
+    ListPage(),
     Placeholder(),
   ];
 
@@ -138,6 +138,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         .push(MaterialPageRoute(builder: (context) {
                       return EditEventPage(
                         initialEvent: null,
+                        typeTitle: 'New Name Day',
+                        backgroundColor: Colors.pink,
+                        type: 'nameday',
                       );
                     })).then((value) => Navigator.pop(context));
                   },
@@ -155,8 +158,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         MaterialStateProperty.all<Color>(Colors.blue),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    // TODO: Implement logic for  button
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return EditEventPage(
+                        initialEvent: null,
+                        typeTitle: 'New Birthday',
+                        backgroundColor: Colors.blue,
+                        type: 'birthday',
+                      );
+                    })).then((value) => Navigator.pop(context));
                   },
                   child: Row(
                     children: [
@@ -172,14 +182,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         MaterialStateProperty.all<Color>(Colors.green),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    // TODO: Implement logic for  button
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return EditEventPage(
+                        initialEvent: null,
+                        typeTitle: 'New Celebration',
+                        backgroundColor: Colors.green,
+                        type: 'other'
+                      );
+                    })).then((value) => Navigator.pop(context));
                   },
                   child: Row(
                     children: [
                       Icon(Icons.celebration),
                       SizedBox(width: 8),
-                      Text('Anniversary'),
+                      Text('Custom celebration'),
                     ],
                   ),
                 ),

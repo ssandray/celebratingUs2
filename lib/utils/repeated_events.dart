@@ -19,7 +19,8 @@ class EventUtils {
         // Add the repeated event to the list
         repeatedEvents.add(DbEvent()
           ..id.v = int.parse('${event?.id.v}$i')
-          ..title.v = event?.title.v
+          ..firstName.v = event?.firstName.v
+          ..lastName.v = event?.lastName.v
           ..specialday.v =
               DateTime(specialDay.year + i, specialDay.month, specialDay.day)
                   .toString()

@@ -32,8 +32,6 @@ class TableEvents extends StatefulWidget {
 class _TableEventsState extends State<TableEvents> {
   late final DbEventsProvider eventsProvider;
   late final Database db;
-  //late final ValueNotifier<List<Event>> _selectedEvents;
-  // late final ValueNotifier<List<DbEvent>> _selectedEvents;
    late final ValueNotifier<List<DbEvent>> _selectedEvents = ValueNotifier([]);
   CalendarFormat _calendarFormat = CalendarFormat.month;   //DEFAULT CALENDAR VIEW
   
@@ -46,7 +44,6 @@ class _TableEventsState extends State<TableEvents> {
  _TableEventsState(this.eventsProvider) {
     db = eventsProvider.db!;
     _selectedDay = _focusedDay;
-   // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
     _namedaysText = '';
 
     _updateSelectedDay(_selectedDay!, _focusedDay, true);
@@ -188,7 +185,7 @@ class _TableEventsState extends State<TableEvents> {
             Container(child: Text('Celebrations'),alignment: Alignment.centerLeft, padding: EdgeInsets.only(left: 20, top: 20)), 
             Container(
               height: 211,
-              child: NoteListPage()),        
+              child: ListPage()),        
             
             //EVENT LIST FOR SELECTED
 

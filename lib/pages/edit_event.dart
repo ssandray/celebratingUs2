@@ -10,8 +10,11 @@ import '../model/model.dart';
 class EditEventPage extends StatefulWidget {
   /// null when adding a note
   final DbEvent? initialEvent;
+  final String typeTitle;
+  final Color backgroundColor;
+  final String type;
 
-  const EditEventPage({Key? key, required this.initialEvent}) : super(key: key);
+  const EditEventPage({Key? key, required this.initialEvent, required this.typeTitle, required this.backgroundColor, required this.type}) : super(key: key);
   @override
   // ignore: library_private_types_in_public_api
   _EditNotePageState createState() => _EditNotePageState();
@@ -19,7 +22,8 @@ class EditEventPage extends StatefulWidget {
 
 class _EditNotePageState extends State<EditEventPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController? _titleTextController;
+  TextEditingController? _firstNameTextController;
+  TextEditingController? _lastNameTextController;
   TextEditingController? _ideasTextController;
   TextEditingController? _specialdayTextController;
 
@@ -27,16 +31,12 @@ class _EditNotePageState extends State<EditEventPage> {
   @override
   void initState() {
     super.initState();
-    _titleTextController =
-        TextEditingController(text: widget.initialEvent?.title.v);
+    _firstNameTextController =
+        TextEditingController(text: widget.initialEvent?.firstName.v);
+        _lastNameTextController =
+        TextEditingController(text: widget.initialEvent?.lastName.v);
     _ideasTextController =
         TextEditingController(text: widget.initialEvent?.ideas.v);
-    // _specialdayTextController = TextEditingController(
-    //       text: widget.initialEvent?.specialday.v != null
-    //           ? DateFormat('yyyy-MM-dd').format(
-    //               DateTime.fromMillisecondsSinceEpoch(
-    //                   widget.initialEvent!.specialday.v!))
-    //           : null); 
      _specialdayTextController = TextEditingController(
     text: widget.initialEvent?.specialday.v ?? ''); // default to empty string if null
   if (widget.initialEvent?.specialday.v != null) {
@@ -59,10 +59,12 @@ class _EditNotePageState extends State<EditEventPage> {
    // print("Parsed value: $epochTimestamp");
       await eventsProvider.saveEvent(DbEvent()
         ..id.v = _eventId
-        ..title.v = _titleTextController!.text
+        ..firstName.v = _firstNameTextController!.text
+        ..lastName.v = _lastNameTextController!.text
         ..ideas.v = _ideasTextController!.text
         ..date.v = DateTime.now().millisecondsSinceEpoch 
-        ..specialday.v = formattedDate); 
+        ..specialday.v = formattedDate 
+        ..type.v = widget.type);
         
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
@@ -79,7 +81,7 @@ class _EditNotePageState extends State<EditEventPage> {
     return WillPopScope(
       onWillPop: () async {
         var dirty = false;
-        if (_titleTextController!.text != widget.initialEvent?.title.v) {
+        if (_firstNameTextController!.text != widget.initialEvent?.firstName.v) {
           dirty = true;
         } else if (_ideasTextController!.text !=
             widget.initialEvent?.ideas.v) {
@@ -125,9 +127,8 @@ class _EditNotePageState extends State<EditEventPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Add celebration',
-          ),
+          title: Text(widget.typeTitle as String), centerTitle: true,
+          backgroundColor: widget.backgroundColor,
           actions: <Widget>[
             if (_eventId != null)
               IconButton(
@@ -209,7 +210,7 @@ class _EditNotePageState extends State<EditEventPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         //NAME
-                        Text('Name'),
+                        Text('First Name'),
                         Padding(padding: EdgeInsets.all(1)),
                         TextFormField(
                           decoration: InputDecoration(
@@ -220,9 +221,27 @@ class _EditNotePageState extends State<EditEventPage> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,), 
                             ),
-                          controller: _titleTextController,
+                          controller: _firstNameTextController,
                           validator: (val) =>
                               val!.isNotEmpty ? null : 'Please enter name',
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                         Text('Last Name'),
+                        Padding(padding: EdgeInsets.all(1)),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[300],
+                            labelText: 'Last Name',
+                            labelStyle: TextStyle(color: Colors.grey),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,), 
+                            ),
+                          controller: _lastNameTextController,
+                          validator: (val) =>
+                              val!.isNotEmpty ? null : 'Please enter last name',
                         ),
                         SizedBox(
                           height: 16,

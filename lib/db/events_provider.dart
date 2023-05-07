@@ -79,7 +79,8 @@ class DbEventsProvider {
     var list = (await db!.query(tableEvents,
         columns: [
           columnId,
-          columnTitle,
+          columnFirstName,
+          columnLastName,
           columnIdeas,
           columnUpdated,
           columnDate,
@@ -97,7 +98,7 @@ class DbEventsProvider {
   Future _createDb(Database db) async {
     await db.execute('DROP TABLE If EXISTS $tableEvents');
     await db.execute(
-        'CREATE TABLE $tableEvents($columnId INTEGER PRIMARY KEY, $columnTitle TEXT, $columnIdeas TEXT, $columnUpdated INTEGER, $columnDate INTEGER, $columnType TEXT)');
+        'CREATE TABLE $tableEvents($columnId INTEGER PRIMARY KEY, $columnFirstName TEXT, $columnLastName TEXT, $columnIdeas TEXT, $columnUpdated INTEGER, $columnDate INTEGER, $columnType TEXT)');
     await db
         .execute('CREATE INDEX EventsUpdated ON $tableEvents ($columnUpdated)');
     await _createNamedayTable(db);
@@ -105,7 +106,8 @@ class DbEventsProvider {
     await _saveEvent(
         db,
         DbEvent()
-          ..title.v = 'Inese'
+          ..firstName.v = 'Inese'
+          ..lastName.v = 'Bērziņa'
           ..ideas.v = 'grāmata par ceļojumiem'
           ..date.v = 1
           ..specialday.v = '2023-05-07'
@@ -113,11 +115,12 @@ class DbEventsProvider {
     await _saveEvent(
         db,
         DbEvent()
-          ..title.v = 'Sintija'
+          ..firstName.v = 'Sintija'
+          ..lastName.v = 'Liepiņa'
           ..ideas.v = 'biļetes uz koncertu'
           ..date.v = 2
           ..specialday.v = '2023-05-09'
-          ..type.v = 'nameday');
+          ..type.v = 'birthday');
     _triggerUpdate();
   }
 
@@ -215,60 +218,13 @@ class DbEventsProvider {
       {int? offset, int? limit, bool? descending}) async {
     // devPrint('fetching $offset $limit');
     var list = (await db!.query(tableEvents,
-        columns: [columnId, columnTitle, columnIdeas, columnDate, columnType],
+        columns: [columnId, columnFirstName, columnLastName, columnIdeas, columnDate, columnType],
         orderBy: '$columnDate ${(descending ?? true) ? 'ASC' : 'DESC'}',
         limit: limit,
         offset: offset));
     return DbEvents(list);
   }
- // GET CELEBRATIONS FOR DATE SELECTED
-  //  Future<DbEvents> getEventsForDay(DateTime date) async {
-  //   var list = (await db!.query(tableEvents,
-  //       columns: [columnId, columnTitle, columnIdeas, columnDate, columnType],
-  //       where: '$columnDate = ?',
-  //       whereArgs: [date],
-  //       //orderBy: '$columnDate ${(descending ?? true) ? 'ASC' : 'DESC'}',
-  //       //limit: limit,
-  //       //offset: offset
-  //       ));
-  //   return DbEvents(list);
-  // }
-// Future<List<DbEvent>> getEventsForDay(DateTime selectedDate) async {
-//   final startOfSelectedDay =
-//       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-//   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
-
-//   final results = await db!.query(
-//     tableEvents,
-//     where: '$columnDate >= ? AND $columnDate < ?',
-//     whereArgs: [
-//       startOfSelectedDay.millisecondsSinceEpoch,
-//       endOfSelectedDay.millisecondsSinceEpoch
-//     ],
-//   );
-
-//   return results.map((snapshot) => snapshotToEvent(snapshot)).toList();
-// }
-// Future<List<DbEvent>?> getEventsForDay(DateTime selectedDate) async {
-//   final startOfSelectedDay =
-//       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-//   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
-
-//   final results = await db!.query(
-//     tableEvents,
-//     where: '$columnDate >= ? AND $columnDate < ?',
-//     whereArgs: [
-//       startOfSelectedDay.millisecondsSinceEpoch,
-//       endOfSelectedDay.millisecondsSinceEpoch
-//     ],
-//   );
-
-//   if (results.isEmpty) {
-//     return null;
-//   }
-
-//   return results.map((snapshot) => snapshotToEvent(snapshot)).toList();
-// }
+ 
 Future<List<DbEvent>> getEventsForDay(DateTime selectedDate) async {
   final startOfSelectedDay =
       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);

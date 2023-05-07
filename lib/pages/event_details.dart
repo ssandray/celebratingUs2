@@ -28,6 +28,9 @@ class _NotePageState extends State<EventDetailsPage> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
               return EditEventPage(
                 initialEvent: event,
+                typeTitle: 'insert name',
+                backgroundColor: Colors.pink,
+                type: 'insert type'
               );
             }));
           }
@@ -59,7 +62,7 @@ class _NotePageState extends State<EventDetailsPage> {
                     child: ListView(children: <Widget>[
                       ListTile(
                           title: Text(
-                        event.title.v!,
+                        event.firstName.v!,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       )),
                       ListTile(title: Text(event.ideas.v ?? ''))
