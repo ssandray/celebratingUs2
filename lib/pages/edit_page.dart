@@ -7,35 +7,35 @@ import 'package:tekartik_common_utils/common_utils_import.dart';
 import '../main.dart';
 import '../model/model.dart';
 
-class EditNotePage extends StatefulWidget {
+class EditEventPage extends StatefulWidget {
   /// null when adding a note
-  final DbNote? initialNote;
+  final DbEvent? initialEvent;
 
-  const EditNotePage({Key? key, required this.initialNote}) : super(key: key);
+  const EditEventPage({Key? key, required this.initialEvent}) : super(key: key);
   @override
   // ignore: library_private_types_in_public_api
   _EditNotePageState createState() => _EditNotePageState();
 }
 
-class _EditNotePageState extends State<EditNotePage> {
+class _EditNotePageState extends State<EditEventPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController? _titleTextController;
-  TextEditingController? _contentTextController;
+  TextEditingController? _ideasTextController;
   TextEditingController? _specialdayTextController;
 
-  int? get _noteId => widget.initialNote?.id.v;
+  int? get _eventId => widget.initialEvent?.id.v;
   @override
   void initState() {
     super.initState();
     _titleTextController =
-        TextEditingController(text: widget.initialNote?.title.v);
-    _contentTextController =
-        TextEditingController(text: widget.initialNote?.content.v);
+        TextEditingController(text: widget.initialEvent?.title.v);
+    _ideasTextController =
+        TextEditingController(text: widget.initialEvent?.ideas.v);
     _specialdayTextController = TextEditingController(
-          text: widget.initialNote?.specialday.v != null
+          text: widget.initialEvent?.specialday.v != null
               ? DateFormat('yyyy-MM-dd').format(
                   DateTime.fromMillisecondsSinceEpoch(
-                      widget.initialNote!.specialday.v!))
+                      widget.initialEvent!.specialday.v!))
               : null);  
   }
 
@@ -48,17 +48,17 @@ class _EditNotePageState extends State<EditNotePage> {
     DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict(dateString);
     int epochTimestamp = parsedDate.millisecondsSinceEpoch;
     print("Parsed value: $epochTimestamp");
-      await noteProvider.saveNote(DbNote()
-        ..id.v = _noteId
+      await eventsProvider.saveEvent(DbEvent()
+        ..id.v = _eventId
         ..title.v = _titleTextController!.text
-        ..content.v = _contentTextController!.text
+        ..ideas.v = _ideasTextController!.text
         ..date.v = DateTime.now().millisecondsSinceEpoch
         ..specialday.v = epochTimestamp); 
         
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
       // Pop twice when editing
-      if (_noteId != null) {
+      if (_eventId != null) {
         // ignore: use_build_context_synchronously
         Navigator.pop(context);
       }
@@ -70,10 +70,10 @@ class _EditNotePageState extends State<EditNotePage> {
     return WillPopScope(
       onWillPop: () async {
         var dirty = false;
-        if (_titleTextController!.text != widget.initialNote?.title.v) {
+        if (_titleTextController!.text != widget.initialEvent?.title.v) {
           dirty = true;
-        } else if (_contentTextController!.text !=
-            widget.initialNote?.content.v) {
+        } else if (_ideasTextController!.text !=
+            widget.initialEvent?.ideas.v) {
           dirty = true;
         }
         if (dirty) {
@@ -120,7 +120,7 @@ class _EditNotePageState extends State<EditNotePage> {
             'Add celebration',
           ),
           actions: <Widget>[
-            if (_noteId != null)
+            if (_eventId != null)
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () async {
@@ -156,7 +156,7 @@ class _EditNotePageState extends State<EditNotePage> {
                             );
                           }) ??
                       false) {
-                    await noteProvider.deleteNote(widget.initialNote!.id.v);
+                    await eventsProvider.deleteEvent(widget.initialEvent!.id.v);
                     // Pop twice to go back to the list
                     // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
@@ -276,7 +276,7 @@ class _EditNotePageState extends State<EditNotePage> {
                             borderSide: BorderSide.none, 
                             ),
                           ),
-                          controller: _contentTextController,
+                          controller: _ideasTextController,
                           keyboardType: TextInputType.multiline,
                           maxLines: 5,
                         )

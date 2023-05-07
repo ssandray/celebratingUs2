@@ -6,8 +6,8 @@ import 'package:tekartik_common_utils/common_utils_import.dart';
 
 import '../main.dart';
 import '../model/model.dart';
-import '../page/edit_page.dart';
-import './note_page.dart';
+import '../pages/edit_page.dart';
+import '../pages/event_details_page.dart';
 
 class NoteListPage extends StatefulWidget {
   const NoteListPage({Key? key}) : super(key: key);
@@ -26,8 +26,8 @@ class _NoteListPageState extends State<NoteListPage> {
       //     title: Text(
       //   'List',
       // )),
-      body: StreamBuilder<List<DbNote?>>(
-        stream: noteProvider.onNotes(),
+      body: StreamBuilder<List<DbEvent?>>(
+        stream: eventsProvider.onEvents(),
         builder: (context, snapshot) {
           var notes = snapshot.data;
           if (notes == null) {
@@ -38,24 +38,24 @@ class _NoteListPageState extends State<NoteListPage> {
           return ListView.builder(
               itemCount: notes.length,
               itemBuilder: (context, index) {
-                var note = notes[index]!;
+                var event = notes[index]!;
 
                 //LIST ITEM STYLE 
 
                 return ListTile(
                   leading: Icon(Icons.cake),
-                  title: Text(note.title.v ?? ''),
-                  subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.specialday.v ?? 0))),
-                  // note.content.v?.isNotEmpty ?? false
-                  //     ? Text(LineSplitter.split(note.content.v!).first)
+                  title: Text(event.title.v ?? ''),
+                  subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(event.specialday.v ?? 0))),
+                  // event.ideas.v?.isNotEmpty ?? false
+                  //     ? Text(LineSplitter.split(event.ideas.v!).first)
                   //     : null , 
                   isThreeLine: true, 
                   trailing: Icon(Icons.more_vert),  
                   onTap: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return NotePage( //CHANGE THIS TO EDITPAGE
-                        noteId: note.id.v,
+                      return EventPage( //CHANGE THIS TO EDITPAGE
+                        eventId: event.id.v,
                       );
                     }));
                   },

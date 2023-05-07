@@ -13,40 +13,40 @@ import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import '../model/nameday_constant.dart';
 
-DbNote snapshotToNote(Map<String, Object?> snapshot) {
-  return DbNote()..fromMap(snapshot);
+DbEvent snapshotToEvent(Map<String, Object?> snapshot) {
+  return DbEvent()..fromMap(snapshot);
 }
 
-class DbNotes extends ListBase<DbNote> {
+class DbEvents extends ListBase<DbEvent> {
   final List<Map<String, Object?>> list;
-  late List<DbNote?> _cacheNotes;
+  late List<DbEvent?> _cacheEvents;
 
-  DbNotes(this.list) {
-    _cacheNotes = List.generate(list.length, (index) => null);
+  DbEvents(this.list) {
+    _cacheEvents = List.generate(list.length, (index) => null);
   }
 
   @override
-  DbNote operator [](int index) {
-    return _cacheNotes[index] ??= snapshotToNote(list[index]);
+  DbEvent operator [](int index) {
+    return _cacheEvents[index] ??= snapshotToEvent(list[index]);
   }
 
   @override
   int get length => list.length;
 
   @override
-  void operator []=(int index, DbNote? value) => throw 'read-only';
+  void operator []=(int index, DbEvent? value) => throw 'read-only';
 
   @override
   set length(int newLength) => throw 'read-only';
 }
 
-class DbNoteProvider {
+class DbEventsProvider {
   final lock = Lock(reentrant: true);
   final DatabaseFactory dbFactory;
   final _updateTriggerController = StreamController<bool>.broadcast();
   Database? db;
 
-  DbNoteProvider(this.dbFactory);
+  DbEventsProvider(this.dbFactory);
 
   Future openPath(String path) async {
     db = await dbFactory.openDatabase(path,
@@ -75,12 +75,12 @@ class DbNoteProvider {
 
 
 //GET CELEBRATION FROM ID
-  Future<DbNote?> getNote(int? id) async {
-    var list = (await db!.query(tableNotes,
+  Future<DbEvent?> getEvent(int? id) async {
+    var list = (await db!.query(tableEvents,
         columns: [
           columnId,
           columnTitle,
-          columnContent,
+          columnIdeas,
           columnUpdated,
           columnDate,
           columnType
@@ -88,33 +88,33 @@ class DbNoteProvider {
         where: '$columnId = ?',
         whereArgs: <Object?>[id]));
     if (list.isNotEmpty) {
-      return DbNote()..fromMap(list.first);
+      return DbEvent()..fromMap(list.first);
     }
     return null;
   }
 
 //CREATE TABLES
   Future _createDb(Database db) async {
-    await db.execute('DROP TABLE If EXISTS $tableNotes');
+    await db.execute('DROP TABLE If EXISTS $tableEvents');
     await db.execute(
-        'CREATE TABLE $tableNotes($columnId INTEGER PRIMARY KEY, $columnTitle TEXT, $columnContent TEXT, $columnUpdated INTEGER, $columnDate INTEGER, $columnType TEXT)');
+        'CREATE TABLE $tableEvents($columnId INTEGER PRIMARY KEY, $columnTitle TEXT, $columnIdeas TEXT, $columnUpdated INTEGER, $columnDate INTEGER, $columnType TEXT)');
     await db
-        .execute('CREATE INDEX NotesUpdated ON $tableNotes ($columnUpdated)');
+        .execute('CREATE INDEX EventsUpdated ON $tableEvents ($columnUpdated)');
     await _createNamedayTable(db);
     //SAMPLE DATA
-    await _saveNote(
+    await _saveEvent(
         db,
-        DbNote()
+        DbEvent()
           ..title.v = 'Inese'
-          ..content.v = 'grāmata par ceļojumiem'
+          ..ideas.v = 'grāmata par ceļojumiem'
           ..date.v = 1
           ..specialday.v = 1687622400000
           ..type.v = 'nameday');
-    await _saveNote(
+    await _saveEvent(
         db,
-        DbNote()
+        DbEvent()
           ..title.v = 'Sintija'
-          ..content.v = 'biļetes uz koncertu'
+          ..ideas.v = 'biļetes uz koncertu'
           ..date.v = 2
           ..specialday.v = 1690310400000
           ..type.v = 'nameday');
@@ -128,51 +128,51 @@ class DbNoteProvider {
   Future<String> fixPath(String path) async => path;
 
   /// ADD or UPDATE CELEBRATION
-  Future _saveNote(DatabaseExecutor? db, DbNote updatedNote) async {
-    if (updatedNote.id.v != null) {
-      await db!.update(tableNotes, updatedNote.toMap(),
-          where: '$columnId = ?', whereArgs: <Object?>[updatedNote.id.v]);
+  Future _saveEvent(DatabaseExecutor? db, DbEvent updatedEvent) async {
+    if (updatedEvent.id.v != null) {
+      await db!.update(tableEvents, updatedEvent.toMap(),
+          where: '$columnId = ?', whereArgs: <Object?>[updatedEvent.id.v]);
     } else {
-      updatedNote.id.v = await db!.insert(tableNotes, updatedNote.toMap());
+      updatedEvent.id.v = await db!.insert(tableEvents, updatedEvent.toMap());
     }
   }
 
-  Future saveNote(DbNote updatedNote) async {
-    await _saveNote(db, updatedNote);
+  Future saveEvent(DbEvent updatedEvent) async {
+    await _saveEvent(db, updatedEvent);
     _triggerUpdate();
   }
 
-  Future<void> deleteNote(int? id) async {
+  Future<void> deleteEvent(int? id) async {
     await db!
-        .delete(tableNotes, where: '$columnId = ?', whereArgs: <Object?>[id]);
+        .delete(tableEvents, where: '$columnId = ?', whereArgs: <Object?>[id]);
     _triggerUpdate();
   }
 
-  var notesTransformer =
-      StreamTransformer<List<Map<String, Object?>>, List<DbNote>>.fromHandlers(
+  var eventsTransformer =
+      StreamTransformer<List<Map<String, Object?>>, List<DbEvent>>.fromHandlers(
           handleData: (snapshotList, sink) {
-    sink.add(DbNotes(snapshotList));
+    sink.add(DbEvents(snapshotList));
   });
 
-  var noteTransformer =
-      StreamTransformer<Map<String, Object?>, DbNote?>.fromHandlers(
+  var eventTransformer =
+      StreamTransformer<Map<String, Object?>, DbEvent?>.fromHandlers(
           handleData: (snapshot, sink) {
-    sink.add(snapshotToNote(snapshot));
+    sink.add(snapshotToEvent(snapshot));
   });
 
-  /// Listen for changes on any note
-  Stream<List<DbNote?>> onNotes() {
-    late StreamController<DbNotes> ctlr;
+  /// Listen for changes on any event
+  Stream<List<DbEvent?>> onEvents() {
+    late StreamController<DbEvents> ctlr;
     StreamSubscription? triggerSubscription;
 
     Future<void> sendUpdate() async {
-      var notes = await getListNotes();
+      var events = await getListEvents();
       if (!ctlr.isClosed) {
-        ctlr.add(notes);
+        ctlr.add(events);
       }
     }
 
-    ctlr = StreamController<DbNotes>(onListen: () {
+    ctlr = StreamController<DbEvents>(onListen: () {
       sendUpdate();
 
       /// Listen for trigger
@@ -185,19 +185,19 @@ class DbNoteProvider {
     return ctlr.stream;
   }
 
-  /// Listed for changes on a given note
-  Stream<DbNote?> onNote(int? id) {
-    late StreamController<DbNote?> ctlr;
+  /// Listed for changes on a given event
+  Stream<DbEvent?> onEvent(int? id) {
+    late StreamController<DbEvent?> ctlr;
     StreamSubscription? triggerSubscription;
 
     Future<void> sendUpdate() async {
-      var note = await getNote(id);
+      var event = await getEvent(id);
       if (!ctlr.isClosed) {
-        ctlr.add(note);
+        ctlr.add(event);
       }
     }
 
-    ctlr = StreamController<DbNote?>(onListen: () {
+    ctlr = StreamController<DbEvent?>(onListen: () {
       sendUpdate();
 
       /// Listen for trigger
@@ -211,35 +211,35 @@ class DbNoteProvider {
   }
 
   /// GET ALL SAVED CELEBRATIONS
-  Future<DbNotes> getListNotes(
+  Future<DbEvents> getListEvents(
       {int? offset, int? limit, bool? descending}) async {
     // devPrint('fetching $offset $limit');
-    var list = (await db!.query(tableNotes,
-        columns: [columnId, columnTitle, columnContent, columnDate, columnType],
+    var list = (await db!.query(tableEvents,
+        columns: [columnId, columnTitle, columnIdeas, columnDate, columnType],
         orderBy: '$columnDate ${(descending ?? true) ? 'ASC' : 'DESC'}',
         limit: limit,
         offset: offset));
-    return DbNotes(list);
+    return DbEvents(list);
   }
  // GET CELEBRATIONS FOR DATE SELECTED
-  //  Future<DbNotes> getEventsForDay(DateTime date) async {
-  //   var list = (await db!.query(tableNotes,
-  //       columns: [columnId, columnTitle, columnContent, columnDate, columnType],
+  //  Future<DbEvents> getEventsForDay(DateTime date) async {
+  //   var list = (await db!.query(tableEvents,
+  //       columns: [columnId, columnTitle, columnIdeas, columnDate, columnType],
   //       where: '$columnDate = ?',
   //       whereArgs: [date],
   //       //orderBy: '$columnDate ${(descending ?? true) ? 'ASC' : 'DESC'}',
   //       //limit: limit,
   //       //offset: offset
   //       ));
-  //   return DbNotes(list);
+  //   return DbEvents(list);
   // }
-// Future<List<DbNote>> getEventsForDay(DateTime selectedDate) async {
+// Future<List<DbEvent>> getEventsForDay(DateTime selectedDate) async {
 //   final startOfSelectedDay =
 //       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 //   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
 
 //   final results = await db!.query(
-//     tableNotes,
+//     tableEvents,
 //     where: '$columnDate >= ? AND $columnDate < ?',
 //     whereArgs: [
 //       startOfSelectedDay.millisecondsSinceEpoch,
@@ -247,15 +247,15 @@ class DbNoteProvider {
 //     ],
 //   );
 
-//   return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+//   return results.map((snapshot) => snapshotToEvent(snapshot)).toList();
 // }
-// Future<List<DbNote>?> getEventsForDay(DateTime selectedDate) async {
+// Future<List<DbEvent>?> getEventsForDay(DateTime selectedDate) async {
 //   final startOfSelectedDay =
 //       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 //   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
 
 //   final results = await db!.query(
-//     tableNotes,
+//     tableEvents,
 //     where: '$columnDate >= ? AND $columnDate < ?',
 //     whereArgs: [
 //       startOfSelectedDay.millisecondsSinceEpoch,
@@ -267,15 +267,15 @@ class DbNoteProvider {
 //     return null;
 //   }
 
-//   return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+//   return results.map((snapshot) => snapshotToEvent(snapshot)).toList();
 // }
-Future<List<DbNote>> getEventsForDay(DateTime selectedDate) async {
+Future<List<DbEvent>> getEventsForDay(DateTime selectedDate) async {
   final startOfSelectedDay =
       DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
   final endOfSelectedDay = startOfSelectedDay.add(Duration(days: 1));
 
   final results = await db!.query(
-    tableNotes,
+    tableEvents,
     where: '$columnDate >= ? AND $columnDate < ?',
     whereArgs: [
       startOfSelectedDay.millisecondsSinceEpoch,
@@ -283,12 +283,12 @@ Future<List<DbNote>> getEventsForDay(DateTime selectedDate) async {
     ],
   );
 
-  return results.map((snapshot) => snapshotToNote(snapshot)).toList();
+  return results.map((snapshot) => snapshotToEvent(snapshot)).toList();
 }
 
 
-  Future clearAllNotes() async {
-    await db!.delete(tableNotes);
+  Future clearAllEvents() async {
+    await db!.delete(tableEvents);
     _triggerUpdate();
   }
 

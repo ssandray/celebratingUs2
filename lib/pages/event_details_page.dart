@@ -3,31 +3,31 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../model/model.dart';
-import '../page/edit_page.dart';
+import '../pages/edit_page.dart';
 
-class NotePage extends StatefulWidget {
-  final int? noteId;
+class EventPage extends StatefulWidget {
+  final int? eventId;
 
-  const NotePage({Key? key, required this.noteId}) : super(key: key);
+  const EventPage({Key? key, required this.eventId}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
   _NotePageState createState() => _NotePageState();
 }
 
-class _NotePageState extends State<NotePage> {
+class _NotePageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DbNote?>(
-      stream: noteProvider.onNote(widget.noteId),
+    return StreamBuilder<DbEvent?>(
+      stream: eventsProvider.onEvent(widget.eventId),
       builder: (context, snapshot) {
-        var note = snapshot.data;
+        var event = snapshot.data;
 
         void edit() {
-          if (note != null) {
+          if (event != null) {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return EditNotePage(
-                initialNote: note,
+              return EditEventPage(
+                initialEvent: event,
               );
             }));
           }
@@ -39,7 +39,7 @@ class _NotePageState extends State<NotePage> {
                 'Celebration',
               ),
               actions: <Widget>[
-                if (note != null)
+                if (event != null)
                   IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () {
@@ -48,7 +48,7 @@ class _NotePageState extends State<NotePage> {
                   ),
               ],
             ),
-            body: (note == null)
+            body: (event == null)
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -59,10 +59,10 @@ class _NotePageState extends State<NotePage> {
                     child: ListView(children: <Widget>[
                       ListTile(
                           title: Text(
-                        note.title.v!,
+                        event.title.v!,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       )),
-                      ListTile(title: Text(note.content.v ?? ''))
+                      ListTile(title: Text(event.ideas.v ?? ''))
                     ]),
                   ));
       },

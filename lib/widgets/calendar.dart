@@ -8,8 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 
 //import './utils.dart';
-import '../page/list_page.dart';
-import '../provider/note_provider.dart';
+import '../widgets/list.dart';
+import '../db/events_provider.dart';
 import '../model/nameday_constant.dart';
 import '../model/model.dart';
 import '../model/model_constant.dart';
@@ -17,21 +17,21 @@ import '../db/db.dart';
 import '../main.dart';
 
 class TableEvents extends StatefulWidget {
-   final DbNoteProvider noteProvider;
+   final DbEventsProvider eventsProvider;
    
-   const TableEvents({Key? key, required this.noteProvider}) : super(key: key);
+   const TableEvents({Key? key, required this.eventsProvider}) : super(key: key);
 
    
   @override
-  _TableEventsState createState() => _TableEventsState(noteProvider);
+  _TableEventsState createState() => _TableEventsState(eventsProvider);
 }
 
 class _TableEventsState extends State<TableEvents> {
-  late final DbNoteProvider noteProvider;
+  late final DbEventsProvider eventsProvider;
   late final Database db;
   //late final ValueNotifier<List<Event>> _selectedEvents;
-  // late final ValueNotifier<List<DbNote>> _selectedEvents;
-   late final ValueNotifier<List<DbNote>> _selectedEvents = ValueNotifier([]);
+  // late final ValueNotifier<List<DbEvent>> _selectedEvents;
+   late final ValueNotifier<List<DbEvent>> _selectedEvents = ValueNotifier([]);
   CalendarFormat _calendarFormat = CalendarFormat.month;   //DEFAULT CALENDAR VIEW
   
   DateTime _focusedDay = DateTime.now();
@@ -40,8 +40,8 @@ class _TableEventsState extends State<TableEvents> {
   //
  
 
- _TableEventsState(this.noteProvider) {
-    db = noteProvider.db!;
+ _TableEventsState(this.eventsProvider) {
+    db = eventsProvider.db!;
     _selectedDay = _focusedDay;
    // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
     _namedaysText = '';
@@ -67,9 +67,10 @@ class _TableEventsState extends State<TableEvents> {
 //     return kEvents[day] ?? []; //nomainīt
 //   }
 
- Future<List<DbNote>> _getEventsForDay(DateTime dateTime) async {
-  List<DbNote> list= await noteProvider.getEventsForDay(dateTime);
-  //final list = await noteProvider.getEventsForDay(dateTime);
+ Future<List<DbEvent>> _getEventsForDay(DateTime dateTime) async {
+  List<DbEvent> list= await eventsProvider.getEventsForDay(dateTime);
+ // print('namedays loaded:' + list!); ar for
+  //final list = await eventsProvider.getEventsForDay(dateTime);
   return list;
 }
 
@@ -77,7 +78,7 @@ class _TableEventsState extends State<TableEvents> {
 //GET NAMEDAYS FOR DAY SELECTED
   Future<String?> getNameday(DateTime datetime) async {
     final formattedDate = DateFormat('dd.MM.').format(datetime);
-    final result = await noteProvider.getNameday(formattedDate);
+    final result = await eventsProvider.getNameday(formattedDate);
 
     print('namedays loaded:' + result!);
     return result;
@@ -116,12 +117,12 @@ class _TableEventsState extends State<TableEvents> {
   @override
   Widget build(BuildContext context) {
 final kToday = DateTime.now();
-final kFirstDay = DateTime(kToday.year, kToday.month - 3, kToday.day);
-final kLastDay = DateTime(kToday.year, kToday.month + 3, kToday.day);
+final kFirstDay = DateTime(kToday.year, kToday.month - 10, kToday.day);
+final kLastDay = DateTime(kToday.year, kToday.month + 10, kToday.day);
     return Container(
         child: Column(
           children: [
-            TableCalendar<DbNote>(
+            TableCalendar<DbEvent>(
               calendarBuilders: CalendarBuilders(), //customize icons for events
               firstDay: kFirstDay,
               lastDay: kLastDay,
@@ -174,7 +175,7 @@ final kLastDay = DateTime(kToday.year, kToday.month + 3, kToday.day);
 
             Expanded(
               child: 
-              ValueListenableBuilder<List<DbNote>>(
+              ValueListenableBuilder<List<DbEvent>>(
                 valueListenable: _selectedEvents,
                 builder: (context, value, _) {
                   return ListView.builder(

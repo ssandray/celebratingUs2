@@ -7,14 +7,14 @@ import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 import 'package:tekartik_app_platform/app_platform.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 
-import 'calendar/calendar.dart';
-import './page/edit_page.dart';
-import './page/list_page.dart';
-import './provider/note_provider.dart';
-import './page/settings_page.dart';
+import 'widgets/calendar.dart';
+import 'pages/edit_page.dart';
+import 'widgets/list.dart';
+import 'db/events_provider.dart';
+import 'pages/settings_page.dart';
 import 'package:flutter/services.dart';
 
-late DbNoteProvider noteProvider;
+late DbEventsProvider eventsProvider;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,9 +27,9 @@ Future main() async {
 
   var databaseFactory = getDatabaseFactory(packageName: packageName);
 
-  noteProvider = DbNoteProvider(databaseFactory);
+  eventsProvider = DbEventsProvider(databaseFactory);
   // devPrint('/notepad Starting');
-  await noteProvider.ready;
+  await eventsProvider.ready;
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,      //LOCK to PORTRAIT MODE
     DeviceOrientation.portraitDown,
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _children = [
-    TableEvents(noteProvider: noteProvider), //calendar view
+    TableEvents(eventsProvider: eventsProvider), //calendar view
     NoteListPage(),
     Placeholder(),
   ];
@@ -136,8 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
-                      return EditNotePage(
-                        initialNote: null,
+                      return EditEventPage(
+                        initialEvent: null,
                       );
                     })).then((value) => Navigator.pop(context));
                   },
