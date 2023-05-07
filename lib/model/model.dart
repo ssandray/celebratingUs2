@@ -7,8 +7,9 @@ class DbEvent extends DbRecord {
   final title = CvField<String>(columnTitle);
   final ideas = CvField<String>(columnIdeas);
   final date = CvField<int>(columnUpdated);
-  final specialday = CvField<int>(columnDate);
+  final specialday = CvField<String>(columnDate);
   final type = CvField<String>(columnType);
+  
 
   @override
   List<CvField> get fields => [id, title, ideas, date, specialday, type];

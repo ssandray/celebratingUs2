@@ -8,10 +8,10 @@ import 'package:tekartik_app_platform/app_platform.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 
 import 'widgets/calendar.dart';
-import 'pages/edit_page.dart';
+import 'pages/edit_event.dart';
 import 'widgets/list.dart';
 import 'db/events_provider.dart';
-import 'pages/settings_page.dart';
+import 'pages/settings.dart';
 import 'package:flutter/services.dart';
 
 late DbEventsProvider eventsProvider;

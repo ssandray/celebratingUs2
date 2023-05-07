@@ -3,19 +3,19 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../model/model.dart';
-import '../pages/edit_page.dart';
+import 'edit_event.dart';
 
-class EventPage extends StatefulWidget {
+class EventDetailsPage extends StatefulWidget {
   final int? eventId;
 
-  const EventPage({Key? key, required this.eventId}) : super(key: key);
+  const EventDetailsPage({Key? key, required this.eventId}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
   _NotePageState createState() => _NotePageState();
 }
 
-class _NotePageState extends State<EventPage> {
+class _NotePageState extends State<EventDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DbEvent?>(

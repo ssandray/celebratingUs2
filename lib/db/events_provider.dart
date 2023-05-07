@@ -108,7 +108,7 @@ class DbEventsProvider {
           ..title.v = 'Inese'
           ..ideas.v = 'grāmata par ceļojumiem'
           ..date.v = 1
-          ..specialday.v = 1687622400000
+          ..specialday.v = '2023-05-07'
           ..type.v = 'nameday');
     await _saveEvent(
         db,
@@ -116,7 +116,7 @@ class DbEventsProvider {
           ..title.v = 'Sintija'
           ..ideas.v = 'biļetes uz koncertu'
           ..date.v = 2
-          ..specialday.v = 1690310400000
+          ..specialday.v = '2023-05-09'
           ..type.v = 'nameday');
     _triggerUpdate();
   }

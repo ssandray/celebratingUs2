@@ -31,12 +31,18 @@ class _EditNotePageState extends State<EditEventPage> {
         TextEditingController(text: widget.initialEvent?.title.v);
     _ideasTextController =
         TextEditingController(text: widget.initialEvent?.ideas.v);
-    _specialdayTextController = TextEditingController(
-          text: widget.initialEvent?.specialday.v != null
-              ? DateFormat('yyyy-MM-dd').format(
-                  DateTime.fromMillisecondsSinceEpoch(
-                      widget.initialEvent!.specialday.v!))
-              : null);  
+    // _specialdayTextController = TextEditingController(
+    //       text: widget.initialEvent?.specialday.v != null
+    //           ? DateFormat('yyyy-MM-dd').format(
+    //               DateTime.fromMillisecondsSinceEpoch(
+    //                   widget.initialEvent!.specialday.v!))
+    //           : null); 
+     _specialdayTextController = TextEditingController(
+    text: widget.initialEvent?.specialday.v ?? ''); // default to empty string if null
+  if (widget.initialEvent?.specialday.v != null) {
+    final specialDay = DateFormat('yyyy-MM-dd').parse(widget.initialEvent!.specialday.v!);
+    _specialdayTextController?.text = DateFormat('yyyy-MM-dd').format(specialDay);
+  }
   }
 
   Future save() async {
@@ -45,15 +51,18 @@ class _EditNotePageState extends State<EditEventPage> {
       print("Selected date before saving: ${_specialdayTextController!.text}");
       // Convert the string representation of date to epoch timestamp
     String dateString = _specialdayTextController!.text;
-    DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict(dateString);
-    int epochTimestamp = parsedDate.millisecondsSinceEpoch;
-    print("Parsed value: $epochTimestamp");
+    DateTime parsedDate = DateTime.parse(dateString);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+    // DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict(dateString);
+    // int epochTimestamp = parsedDate.millisecondsSinceEpoch;
+    print("Parsed value: $parsedDate");
+   // print("Parsed value: $epochTimestamp");
       await eventsProvider.saveEvent(DbEvent()
         ..id.v = _eventId
         ..title.v = _titleTextController!.text
         ..ideas.v = _ideasTextController!.text
-        ..date.v = DateTime.now().millisecondsSinceEpoch
-        ..specialday.v = epochTimestamp); 
+        ..date.v = DateTime.now().millisecondsSinceEpoch 
+        ..specialday.v = formattedDate); 
         
       // ignore: use_build_context_synchronously
       Navigator.pop(context);

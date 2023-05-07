@@ -6,8 +6,8 @@ import 'package:tekartik_common_utils/common_utils_import.dart';
 
 import '../main.dart';
 import '../model/model.dart';
-import '../pages/edit_page.dart';
-import '../pages/event_details_page.dart';
+import '../pages/edit_event.dart';
+import '../pages/event_details.dart';
 
 class NoteListPage extends StatefulWidget {
   const NoteListPage({Key? key}) : super(key: key);
@@ -26,39 +26,78 @@ class _NoteListPageState extends State<NoteListPage> {
       //     title: Text(
       //   'List',
       // )),
+
+      //LOAD list of saved events
       body: StreamBuilder<List<DbEvent?>>(
         stream: eventsProvider.onEvents(),
         builder: (context, snapshot) {
-          var notes = snapshot.data;
-          if (notes == null) {
+          var events = snapshot.data;
+          if (events == null) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
-          return ListView.builder(
-              itemCount: notes.length,
-              itemBuilder: (context, index) {
-                var event = notes[index]!;
 
+// List to hold the repeated events
+      List<DbEvent> repeatedEvents = [];
+
+      // Iterate through each event and repeat it for the next 10 years
+      for (var event in events) {
+        // Get the special day for the current event
+        var specialDay = DateTime.parse(event?.specialday.v ?? '1970-01-01');
+
+        // Iterate through the next 10 years and repeat the event
+      for (int i = 0; i < 10; i++) {
+          // Add the repeated event to the list
+          repeatedEvents.add(DbEvent()
+            ..id.v = int.parse('${event?.id.v}$i')
+            ..title.v = event?.title.v
+            ..specialday.v =  DateTime(specialDay.year + i, specialDay.month, specialDay.day).toString()
+            ..ideas.v = event?.ideas.v
+          );
+        }
+      }
+
+      // Sort the list of repeated events by the special day
+    repeatedEvents.sort((a, b) => DateTime.parse(a.specialday.v!).compareTo(DateTime.parse(b.specialday.v!)));
+
+
+
+
+          return ListView.builder(
+              itemCount: repeatedEvents.length,
+              itemBuilder: (context, index) {
+                var event = repeatedEvents[index];
+                
                 //LIST ITEM STYLE 
 
                 return ListTile(
                   leading: Icon(Icons.cake),
                   title: Text(event.title.v ?? ''),
-                  subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(event.specialday.v ?? 0))),
+                  //subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(event.specialday.v ?? 0))),
+                  subtitle: Text(DateFormat('yyyy-MM-dd').format(DateTime.parse(event.specialday.v ?? '1970-01-01'))),
                   // event.ideas.v?.isNotEmpty ?? false
                   //     ? Text(LineSplitter.split(event.ideas.v!).first)
                   //     : null , 
                   isThreeLine: true, 
                   trailing: Icon(Icons.more_vert),  
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return EventPage( //CHANGE THIS TO EDITPAGE
-                        eventId: event.id.v,
-                      );
-                    }));
-                  },
+                  // onTap: () {
+                  //   Navigator.of(context)
+                  //       .push(MaterialPageRoute(builder: (context) {
+                  //     return EventDetailsPage( 
+                  //       eventId: repeatedEvents[index].id.v,
+                  //     );
+                  //   }));
+                  // },
+    onTap: () {
+  int originalEventId = int.parse(event.id.v.toString().substring(0, event.id.v.toString().length - 1));
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+    return EventDetailsPage(
+      eventId: originalEventId,
+    );
+  }));
+},
+
                 );
               });
         },
