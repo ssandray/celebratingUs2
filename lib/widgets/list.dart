@@ -8,6 +8,8 @@ import '../main.dart';
 import '../model/model.dart';
 import '../pages/edit_event.dart';
 import '../pages/event_details.dart';
+import '../utils/repeated_events.dart';
+
 
 class NoteListPage extends StatefulWidget {
   const NoteListPage({Key? key}) : super(key: key);
@@ -37,37 +39,37 @@ class _NoteListPageState extends State<NoteListPage> {
               child: CircularProgressIndicator(),
             );
           }
+EventUtils.generateRepeatedEvents(events);
+// //List to hold the repeated events
+//       List<DbEvent> repeatedEvents = [];
 
-// List to hold the repeated events
-      List<DbEvent> repeatedEvents = [];
+//       // Iterate through each event and repeat it for the next 10 years
+//       for (var event in events) {
+//         // Get the special day for the current event
+//         var specialDay = DateTime.parse(event?.specialday.v ?? '1970-01-01');
 
-      // Iterate through each event and repeat it for the next 10 years
-      for (var event in events) {
-        // Get the special day for the current event
-        var specialDay = DateTime.parse(event?.specialday.v ?? '1970-01-01');
+//         // Iterate through the next 10 years and repeat the event
+//       for (int i = 0; i < 10; i++) {
+//           // Add the repeated event to the list
+//           repeatedEvents.add(DbEvent()
+//             ..id.v = int.parse('${event?.id.v}$i')
+//             ..title.v = event?.title.v
+//             ..specialday.v =  DateTime(specialDay.year + i, specialDay.month, specialDay.day).toString()
+//             ..ideas.v = event?.ideas.v
+//           );
+//         }
+//       }
 
-        // Iterate through the next 10 years and repeat the event
-      for (int i = 0; i < 10; i++) {
-          // Add the repeated event to the list
-          repeatedEvents.add(DbEvent()
-            ..id.v = int.parse('${event?.id.v}$i')
-            ..title.v = event?.title.v
-            ..specialday.v =  DateTime(specialDay.year + i, specialDay.month, specialDay.day).toString()
-            ..ideas.v = event?.ideas.v
-          );
-        }
-      }
-
-      // Sort the list of repeated events by the special day
-    repeatedEvents.sort((a, b) => DateTime.parse(a.specialday.v!).compareTo(DateTime.parse(b.specialday.v!)));
+//       // Sort the list of repeated events by the special day
+//     repeatedEvents.sort((a, b) => DateTime.parse(a.specialday.v!).compareTo(DateTime.parse(b.specialday.v!)));
 
 
 
 
           return ListView.builder(
-              itemCount: repeatedEvents.length,
+              itemCount: EventUtils.repeatedEvents.length, //repeatedEvents.length,
               itemBuilder: (context, index) {
-                var event = repeatedEvents[index];
+                var event = EventUtils.repeatedEvents[index];
                 
                 //LIST ITEM STYLE 
 

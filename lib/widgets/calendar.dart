@@ -15,11 +15,14 @@ import '../model/model.dart';
 import '../model/model_constant.dart';
 import '../db/db.dart';
 import '../main.dart';
+import '../utils/repeated_events.dart';
 
 class TableEvents extends StatefulWidget {
    final DbEventsProvider eventsProvider;
+   final events = EventUtils.repeatedEvents;
    
-   const TableEvents({Key? key, required this.eventsProvider}) : super(key: key);
+      
+   TableEvents({Key? key, required this.eventsProvider}) : super(key: key); //const
 
    
   @override
