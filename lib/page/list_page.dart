@@ -36,20 +36,20 @@ class _NoteListPageState extends State<NoteListPage> {
             );
           }
           return ListView.builder(
+              shrinkWrap: true,
               itemCount: notes.length,
               itemBuilder: (context, index) {
                 var note = notes[index]!;
 
-                //LIST ITEM STYLE 
-
+                //LIST ITEM STYLE
                 return ListTile(
                   leading: Icon(Icons.cake),
                   title: Text(note.title.v ?? ''),
+                  visualDensity:VisualDensity(horizontal: 0, vertical: -4),
                   subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.specialday.v ?? 0))),
                   // note.content.v?.isNotEmpty ?? false
                   //     ? Text(LineSplitter.split(note.content.v!).first)
-                  //     : null , 
-                  isThreeLine: true, 
+                  //     : null ,
                   trailing: Icon(Icons.more_vert),  
                   onTap: () {
                     Navigator.of(context)
