@@ -22,7 +22,7 @@ class TableEvents extends StatefulWidget {
    final events = EventUtils.repeatedEvents;
    
       
-   TableEvents({Key? key, required this.eventsProvider}) : super(key: key); //const
+  TableEvents({Key? key, required this.eventsProvider}) : super(key: key);
 
    
   @override
@@ -119,21 +119,37 @@ class _TableEventsState extends State<TableEvents> {
 
   @override
   Widget build(BuildContext context) {
-final kToday = DateTime.now();
-final kFirstDay = DateTime(kToday.year, kToday.month - 24, kToday.day);
-final kLastDay = DateTime(kToday.year, kToday.month + 24, kToday.day);
     return Container(
         child: Column(
           children: [
             TableCalendar<DbEvent>(
-              calendarBuilders: CalendarBuilders(), //customize icons for events
-              firstDay: kFirstDay,
-              lastDay: kLastDay,
+              calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Stack(
+                    children: [
+                      if (events.any((event) => event.type == 'nameday'))
+                        Icon(Icons.circle, color: Colors.pink, size: 5),
+                      if (events.any((event) => event.type == 'birthday'))
+                        Icon(Icons.circle, color: Colors.blue, size: 5),
+                      Icon(Icons.circle,
+                          color: Colors.green.withOpacity(0.5), size: 10),
+                    ],
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ), //customize ICONS for events
+              firstDay: DateTime.utc(2023, 01, 01),
+              lastDay: DateTime.utc(2033, 12, 31),
               focusedDay: _focusedDay,
               selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
               availableCalendarFormats: availableCalendarFormats,
               calendarFormat: _calendarFormat,
-             //eventLoader: _getEventsForDay,                          //HOW TO FIX THIS ERROR
+            //  eventLoader: (day) {  
+            //   //return _getEventsForDay(day);
+            //  },                          //HOW TO FIX THIS ERROR
               startingDayOfWeek: StartingDayOfWeek.monday,
               calendarStyle: const CalendarStyle(// Use `CalendarStyle` to customize the UI
                 outsideDaysVisible: false,

@@ -1,5 +1,7 @@
 import '../model/model.dart';
 
+//THIS IS USED IN LIST, MAYBE IN CALENDAR TOO?
+
 class EventUtils {
   static List<DbEvent> repeatedEvents = [];
   static void generateRepeatedEvents(List<DbEvent?> events) {
