@@ -26,7 +26,7 @@ class _NoteListPageState extends State<NoteListPage> {
       //     title: Text(
       //   'List',
       // )),
-      body: StreamBuilder<List<DbNote?>>(
+      body: StreamBuilder<List<DbNote>>(
         stream: noteProvider.onNotes(),
         builder: (context, snapshot) {
           var notes = snapshot.data;
@@ -39,14 +39,14 @@ class _NoteListPageState extends State<NoteListPage> {
               shrinkWrap: true,
               itemCount: notes.length,
               itemBuilder: (context, index) {
-                var note = notes[index]!;
+                var note = notes[index];
 
                 //LIST ITEM STYLE
                 return ListTile(
                   leading: Icon(Icons.cake),
                   title: Text(note.title.v ?? ''),
                   visualDensity:VisualDensity(horizontal: 0, vertical: -4),
-                  subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.specialday.v ?? 0))),
+                  subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.date.v ?? 0))),
                   // note.content.v?.isNotEmpty ?? false
                   //     ? Text(LineSplitter.split(note.content.v!).first)
                   //     : null ,

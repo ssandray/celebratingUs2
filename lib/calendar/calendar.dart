@@ -29,22 +29,23 @@ class TableEvents extends StatefulWidget {
 class _TableEventsState extends State<TableEvents> {
   late final DbNoteProvider noteProvider;
   late final Database db;
-  //late final ValueNotifier<List<Event>> _selectedEvents;
-  // late final ValueNotifier<List<DbNote>> _selectedEvents;
   late final ValueNotifier<List<DbNote>> _selectedEvents = ValueNotifier([]);
+  late Stream<List<DbNote>> eventStream;
+  Map<DateTime, List<DbNote>> _eventsByDate = {};
   CalendarFormat _calendarFormat = CalendarFormat.month;   //DEFAULT CALENDAR VIEW
-  
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   String? _namedaysText;
   //
- 
 
  _TableEventsState(this.noteProvider) {
     db = noteProvider.db!;
     _selectedDay = _focusedDay;
-   // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
     _namedaysText = '';
+    eventStream = noteProvider.onNotes();
+    eventStream.listen((events) {
+      _updateEventsByDate(events);
+    });
 
     _updateSelectedDay(_selectedDay!, _focusedDay, true);
   }
@@ -54,17 +55,43 @@ class _TableEventsState extends State<TableEvents> {
     super.initState();
   }
 
-
   @override
   void dispose() {
     _selectedEvents.dispose();
     super.dispose();
   }
 
+  void _updateEventsByDate(List<DbNote> list) {
+    final Map<DateTime, List<DbNote>> newEventsByDate = {};
+    for (final event in list) {
+        final date = DateTime.fromMillisecondsSinceEpoch(event.date.v ?? 0);
+        final dateWithoutTime = _getOnlyDatePart(date);
+        if (newEventsByDate.containsKey(_getOnlyDatePart(dateWithoutTime))) {
+          newEventsByDate[dateWithoutTime]!.add(event);
+        } else {
+          newEventsByDate[dateWithoutTime] = [event];
+        }
+    }
+
+    print('events updated for ${newEventsByDate.keys.length} dates');
+
+    setState(() {
+      _eventsByDate = newEventsByDate;
+    });
+  }
+
+  DateTime _getOnlyDatePart(DateTime dateTime) {
+    return DateTime(
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+    );
+  }
+
   //GET EVENTS FOR DAY SELECTED
-  Future<List<DbNote>> _getEventsForDay(DateTime dateTime) async {
-    List<DbNote> list = await noteProvider.getEventsForDay(dateTime);
-    return list;
+  List<DbNote> _getEventsForDay(DateTime dateTime)  {
+   final events = _eventsByDate[_getOnlyDatePart(dateTime)];
+   return events ?? <DbNote>[];
   }
 
   //GET NAMEDAYS FOR DAY SELECTED
@@ -84,7 +111,7 @@ class _TableEventsState extends State<TableEvents> {
   void _updateSelectedDay(DateTime selectedDay, DateTime focusedDay, bool forceUpdate) async {
     if (!isSameDay(_selectedDay, selectedDay) || forceUpdate) {
       final nameDays = await getNameday(selectedDay); // get nameday from database
-      final events = await _getEventsForDay(selectedDay); // get events for selected day
+      final events = _getEventsForDay(selectedDay); // get events for selected day
 
       setState(() {
         _selectedDay = selectedDay;
@@ -107,8 +134,6 @@ class _TableEventsState extends State<TableEvents> {
     CalendarFormat.week: 'Month',
   };
 
-
-
   @override
   Widget build(BuildContext context) {
     final kToday = DateTime.now();
@@ -118,14 +143,15 @@ class _TableEventsState extends State<TableEvents> {
     return Column(
       children: [
         TableCalendar<DbNote>(
-          calendarBuilders: CalendarBuilders(), //customize icons for events
+          // TODO: add custom colors for Event dot indicators
+          calendarBuilders: CalendarBuilders(),
           firstDay: kFirstDay,
           lastDay: kLastDay,
           focusedDay: _focusedDay,
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           availableCalendarFormats: availableCalendarFormats,
           calendarFormat: _calendarFormat,
-          //eventLoader: _getEventsForDay,                          //HOW TO FIX THIS ERROR
+          eventLoader: _getEventsForDay,
           startingDayOfWeek: StartingDayOfWeek.monday,
           calendarStyle: const CalendarStyle(// Use `CalendarStyle` to customize the UI
               outsideDaysVisible: false,
@@ -174,7 +200,7 @@ class _TableEventsState extends State<TableEvents> {
                     child: ListTile(
                       leading: const Icon(Icons.cake),
                       title: Text(note.title.v ?? ''),
-                      subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.specialday.v ?? 0))),
+                      subtitle: Text(DateFormat('dd-MMM-yyy').format(DateTime.fromMillisecondsSinceEpoch(note.date.v ?? 0))),
                       trailing: const Icon(Icons.more_vert),
                     ),
                   );

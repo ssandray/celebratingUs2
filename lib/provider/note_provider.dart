@@ -107,16 +107,16 @@ class DbNoteProvider {
         DbNote()
           ..title.v = 'Inese'
           ..content.v = 'grāmata par ceļojumiem'
-          ..date.v = 1
-          ..specialday.v = 1687622400000
+          ..updated.v = 1
+          ..date.v = 1687622400000
           ..type.v = 'nameday');
     await _saveNote(
         db,
         DbNote()
           ..title.v = 'Sintija'
           ..content.v = 'biļetes uz koncertu'
-          ..date.v = 2
-          ..specialday.v = 1690310400000
+          ..updated.v = 2
+          ..date.v = 1690310400000
           ..type.v = 'nameday');
     _triggerUpdate();
   }
@@ -161,7 +161,7 @@ class DbNoteProvider {
   });
 
   /// Listen for changes on any note
-  Stream<List<DbNote?>> onNotes() {
+  Stream<List<DbNote>> onNotes() {
     late StreamController<DbNotes> ctlr;
     StreamSubscription? triggerSubscription;
 
@@ -234,7 +234,6 @@ class DbNoteProvider {
           startOfSelectedDay.millisecondsSinceEpoch,
           endOfSelectedDay.millisecondsSinceEpoch
         ],
-        orderBy: '$columnDate ASC'
     );
 
     return results.map((snapshot) => snapshotToNote(snapshot)).toList();

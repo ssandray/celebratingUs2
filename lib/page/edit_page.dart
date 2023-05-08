@@ -32,10 +32,10 @@ class _EditNotePageState extends State<EditNotePage> {
     _contentTextController =
         TextEditingController(text: widget.initialNote?.content.v);
     _specialdayTextController = TextEditingController(
-          text: widget.initialNote?.specialday.v != null
+          text: widget.initialNote?.date.v != null
               ? DateFormat('yyyy-MM-dd').format(
                   DateTime.fromMillisecondsSinceEpoch(
-                      widget.initialNote!.specialday.v!))
+                      widget.initialNote!.date.v!))
               : null);  
   }
 
@@ -52,8 +52,8 @@ class _EditNotePageState extends State<EditNotePage> {
         ..id.v = _noteId
         ..title.v = _titleTextController!.text
         ..content.v = _contentTextController!.text
-        ..date.v = DateTime.now().millisecondsSinceEpoch
-        ..specialday.v = epochTimestamp); 
+        ..updated.v = DateTime.now().millisecondsSinceEpoch
+        ..date.v = epochTimestamp);
         
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
