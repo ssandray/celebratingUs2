@@ -16,7 +16,7 @@ Future<List<DbEvent>> getAllEvents(Database db) async {
 List<DbEvent> repeatEvent(DbEvent event) {
   final List<DbEvent> events = [];
 
-  final date = DateTime.parse(event.specialday.v!);
+  final date = DateTime.parse(event.evdate.v!);
   final formatter = DateFormat('yyyy-MM-dd');
 
   for (int i = 1; i <= 10; i++) {
@@ -25,8 +25,8 @@ List<DbEvent> repeatEvent(DbEvent event) {
       ..firstName.v = event.firstName.v
       ..lastName.v = event.lastName.v
       ..ideas.v = event.ideas.v
-      ..date.v = event.date.v
-      ..specialday.v = formatter.format(newDate)
+      ..updated.v = event.updated.v
+      ..evdate.v = formatter.format(newDate)
       ..type.v = event.type.v;
     events.add(newEvent);
   }
@@ -44,7 +44,7 @@ Future<LinkedHashMap<String, List<DbEvent>>> getAllEventsRepeated(
   for (final event in events) {
     final repeatedEvents = repeatEvent(event);
     for (final repeatedEvent in repeatedEvents) {
-      final key = repeatedEvent.specialday.v!;
+      final key = repeatedEvent.evdate.v!;
       if (!map.containsKey(key)) {
         map[key] = [];
       }

@@ -109,8 +109,8 @@ class DbEventsProvider {
           ..firstName.v = 'Inese'
           ..lastName.v = 'Bērziņa'
           ..ideas.v = 'grāmata par ceļojumiem'
-          ..date.v = 1
-          ..specialday.v = '2023-05-07'
+          ..updated.v = 1
+          ..evdate.v = '2023-05-07'
           ..type.v = 'nameday');
     await _saveEvent(
         db,
@@ -118,9 +118,18 @@ class DbEventsProvider {
           ..firstName.v = 'Sintija'
           ..lastName.v = 'Liepiņa'
           ..ideas.v = 'biļetes uz koncertu'
-          ..date.v = 2
-          ..specialday.v = '2023-05-09'
+          ..updated.v = 2
+          ..evdate.v = '2023-05-09'
           ..type.v = 'birthday');
+          await _saveEvent(
+        db,
+        DbEvent()
+          ..firstName.v = 'Kristaps'
+          ..lastName.v = 'O. - izlaidums'
+          ..ideas.v = ''
+          ..updated.v = 1
+          ..evdate.v = '2023-05-30'
+          ..type.v = 'other');
     _triggerUpdate();
   }
 
@@ -164,7 +173,7 @@ class DbEventsProvider {
   });
 
   /// Listen for changes on any event
-  Stream<List<DbEvent?>> onEvents() {
+  Stream<List<DbEvent>> onEvents() {
     late StreamController<DbEvents> ctlr;
     StreamSubscription? triggerSubscription;
 

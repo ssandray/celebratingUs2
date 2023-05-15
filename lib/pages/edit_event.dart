@@ -25,7 +25,7 @@ class _EditNotePageState extends State<EditEventPage> {
   TextEditingController? _firstNameTextController;
   TextEditingController? _lastNameTextController;
   TextEditingController? _ideasTextController;
-  TextEditingController? _specialdayTextController;
+  TextEditingController? _evdateTextController;
 
   int? get _eventId => widget.initialEvent?.id.v;
   @override
@@ -37,20 +37,20 @@ class _EditNotePageState extends State<EditEventPage> {
         TextEditingController(text: widget.initialEvent?.lastName.v);
     _ideasTextController =
         TextEditingController(text: widget.initialEvent?.ideas.v);
-     _specialdayTextController = TextEditingController(
-    text: widget.initialEvent?.specialday.v ?? ''); // default to empty string if null
-  if (widget.initialEvent?.specialday.v != null) {
-    final specialDay = DateFormat('yyyy-MM-dd').parse(widget.initialEvent!.specialday.v!);
-    _specialdayTextController?.text = DateFormat('yyyy-MM-dd').format(specialDay);
+     _evdateTextController = TextEditingController(
+    text: widget.initialEvent?.evdate.v ?? ''); // default to empty string if null
+  if (widget.initialEvent?.evdate.v != null) {
+    final evdate = DateFormat('yyyy-MM-dd').parse(widget.initialEvent!.evdate.v!);
+    _evdateTextController?.text = DateFormat('yyyy-MM-dd').format(evdate);
   }
   }
 
   Future save() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print("Selected date before saving: ${_specialdayTextController!.text}");
+      print("Selected date before saving: ${_evdateTextController!.text}");
       // Convert the string representation of date to epoch timestamp
-    String dateString = _specialdayTextController!.text;
+    String dateString = _evdateTextController!.text;
     DateTime parsedDate = DateTime.parse(dateString);
     String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
     // DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict(dateString);
@@ -62,8 +62,8 @@ class _EditNotePageState extends State<EditEventPage> {
         ..firstName.v = _firstNameTextController!.text
         ..lastName.v = _lastNameTextController!.text
         ..ideas.v = _ideasTextController!.text
-        ..date.v = DateTime.now().millisecondsSinceEpoch 
-        ..specialday.v = formattedDate 
+        ..updated.v = DateTime.now().millisecondsSinceEpoch 
+        ..evdate.v = formattedDate 
         ..type.v = widget.type);
         
       // ignore: use_build_context_synchronously
@@ -259,7 +259,7 @@ class _EditNotePageState extends State<EditEventPage> {
                             borderSide: BorderSide.none, 
                             ),
                           ),
-                          controller: _specialdayTextController,
+                          controller: _evdateTextController,
                           onTap: () async {
                             var pickedDate = await showDatePicker(
                                 context: context,
@@ -278,7 +278,7 @@ class _EditNotePageState extends State<EditEventPage> {
                               //you can implement different kind of Date Format here according to your requirement
                 
                               setState(() {
-                                _specialdayTextController!.text =
+                                _evdateTextController!.text =
                                     formattedDate; //set output date to TextField value.
                               });
                             } else {

@@ -11,18 +11,18 @@ class EventUtils {
     // Iterate through each event and repeat it for the next 10 years
     for (var event in events) {
       // Get the special day for the current event
-      var specialDay =
-          DateTime.parse(event?.specialday.v ?? '1970-01-01');
+      var evdate =
+          DateTime.parse(event?.evdate.v ?? '1970-01-01');
 
       // Iterate through the next 10 years and repeat the event
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 2; i++) {
         // Add the repeated event to the list
         repeatedEvents.add(DbEvent()
           ..id.v = int.parse('${event?.id.v}$i')
           ..firstName.v = event?.firstName.v
           ..lastName.v = event?.lastName.v
-          ..specialday.v =
-              DateTime(specialDay.year + i, specialDay.month, specialDay.day)
+          ..evdate.v =
+              DateTime(evdate.year + i, evdate.month, evdate.day)
                   .toString()
           ..ideas.v = event?.ideas.v);
       }
@@ -30,7 +30,7 @@ class EventUtils {
 
     // Sort the list of repeated events by the special day
     repeatedEvents.sort(
-        (a, b) => DateTime.parse(a.specialday.v!)
-            .compareTo(DateTime.parse(b.specialday.v!)));
+        (a, b) => DateTime.parse(a.evdate.v!)
+            .compareTo(DateTime.parse(b.evdate.v!)));
   }
 }

@@ -23,7 +23,7 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       //LOAD list of saved events
-      body: StreamBuilder<List<DbEvent?>>(
+      body: StreamBuilder<List<DbEvent?>>( //CH?
         stream: eventsProvider.onEvents(),
         builder: (context, snapshot) {
           var events = snapshot.data;
@@ -37,15 +37,16 @@ class _ListPageState extends State<ListPage> {
           return ListView.builder(
               itemCount: EventUtils.repeatedEvents.length,
               itemBuilder: (context, index) {
-                var event = EventUtils.repeatedEvents[index];
+                var event = EventUtils.repeatedEvents[index]; //CH?
 
                 //LIST ITEM STYLE
 
                 return ListTile(
                   leading: Icon(Icons.cake),
                   title: Text(event.firstName.v ?? ''),
+                   visualDensity:VisualDensity(horizontal: 0, vertical: -4),
                   subtitle: Text(DateFormat('yyyy-MM-dd').format(
-                      DateTime.parse(event.specialday.v ?? '1970-01-01'))),
+                      DateTime.parse(event.evdate.v ?? '1970-01-01'))),
                   isThreeLine: true,
                   trailing: Icon(Icons.more_vert),
                   onTap: () {

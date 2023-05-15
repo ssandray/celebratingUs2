@@ -8,7 +8,7 @@ String columnLastName = 'lastName';
 String columnId = '_id';
 String columnIdeas = 'ideas';
 String columnUpdated = 'updated';
-String columnDate = 'specialday';
+String columnDate = 'evdate';
 String columnType = 'type'; //nameday, birthday, other ..
 
 
