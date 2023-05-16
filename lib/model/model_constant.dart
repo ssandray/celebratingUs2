@@ -11,6 +11,4 @@ String columnUpdated = 'updated';
 String columnDate = 'evdate';
 String columnType = 'type'; //nameday, birthday, other ..
 
-
-
 String tableEvents = 'Events'; 

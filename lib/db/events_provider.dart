@@ -109,8 +109,8 @@ class DbEventsProvider {
           ..firstName.v = 'Inese'
           ..lastName.v = 'Bērziņa'
           ..ideas.v = 'grāmata par ceļojumiem'
-          ..updated.v = 1
-          ..evdate.v = '2023-05-07'
+          ..updated.v = 1684254202
+          ..evdate.v = '2023-05-09'
           ..type.v = 'nameday');
     await _saveEvent(
         db,
@@ -118,17 +118,17 @@ class DbEventsProvider {
           ..firstName.v = 'Sintija'
           ..lastName.v = 'Liepiņa'
           ..ideas.v = 'biļetes uz koncertu'
-          ..updated.v = 2
+          ..updated.v = 1684254202
           ..evdate.v = '2023-05-09'
           ..type.v = 'birthday');
           await _saveEvent(
         db,
         DbEvent()
-          ..firstName.v = 'Kristaps'
-          ..lastName.v = 'O. - izlaidums'
-          ..ideas.v = ''
-          ..updated.v = 1
-          ..evdate.v = '2023-05-30'
+          ..firstName.v = 'Sanita & Kristaps'
+          ..lastName.v = 'Kalniņi - 2023'
+          ..ideas.v = 'dāvanu karte/nauda?'
+          ..updated.v = 1684254202
+          ..evdate.v = '2023-05-27'
           ..type.v = 'other');
     _triggerUpdate();
   }
@@ -323,9 +323,5 @@ Future<String?> getNameday(String date) async {
     return null;
   }
 }
-
-
-  
-
   
 }

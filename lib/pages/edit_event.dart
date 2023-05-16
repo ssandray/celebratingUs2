@@ -187,12 +187,6 @@ class _EditNotePageState extends State<EditEventPage> {
           style: TextButton.styleFrom(
             foregroundColor: Colors.black, 
               ))
-            // IconButton(
-            //   icon: Icon(Icons.star),
-            //   onPressed: () {
-            //     save();
-            //   },
-            // ),
           ],
         ),
 
@@ -263,10 +257,12 @@ class _EditNotePageState extends State<EditEventPage> {
                           onTap: () async {
                             var pickedDate = await showDatePicker(
                                 context: context,
+                               
                                 initialDate: DateTime.now(),
                                 firstDate: DateTime(
                                     2023), //DateTime.now() - not to allow to choose before today.
-                                lastDate: DateTime(2033));
+                                lastDate: DateTime(2033), 
+                               );
                 
                             if (pickedDate != null) {
                               print(

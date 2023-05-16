@@ -7,7 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 
-//import './utils.dart';
+
 import '../widgets/list.dart';
 import '../db/events_provider.dart';
 import '../model/nameday_constant.dart';
@@ -161,13 +161,12 @@ class _TableEventsState extends State<TableEvents> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: eventTypes.take(maxMarkers).map((eventType) {
-          //final int count = events.where((event) => event.type.v == eventType).length;
-
+          
           return Stack(
             alignment: Alignment.center,
             children: [
               Icon(getMarkerIcon(eventType), color: getMarkerColor(eventType), size: 8),
-              //if (count > 1) Text('+${count - 1}', style: TextStyle(fontSize: 8)),
+              
             ],
           );
         }).toList(),
@@ -177,7 +176,6 @@ class _TableEventsState extends State<TableEvents> {
     return Container();
   }
 },
-
 
 
             ), //customize ICONS for events
@@ -241,7 +239,7 @@ class _TableEventsState extends State<TableEvents> {
                       return Container(
                         child: ListTile(
                           leading: const Icon(Icons.cake),
-                          title: Text(event.firstName.v ?? ''),
+                          title: Text((event.firstName.v ?? '') + ' ' + (event.lastName.v ?? '')),
                           subtitle: Text(event.evdate.v ?? ''),
                           trailing: const Icon(Icons.more_vert),
                   //          onTap: () {
