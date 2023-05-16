@@ -1,6 +1,6 @@
 App for celebrations 🎉
 
-Version info
+Version info <br>
 0.1.1 - calendar view, list view, items can be saved, edited, deleted <br>
 0.2.1 - added csv list of namedays, nameday is displayed for date selected.  <br>
 Added versioning and settings screen that displays current version. Landscape view turned off. <br>
