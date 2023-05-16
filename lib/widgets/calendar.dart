@@ -16,6 +16,7 @@ import '../model/model_constant.dart';
 import '../db/db.dart';
 import '../main.dart';
 import '../utils/repeated_events.dart';
+import '../pages/event_details.dart';
 
 class TableEvents extends StatefulWidget {
   final DbEventsProvider eventsProvider;
@@ -243,6 +244,24 @@ class _TableEventsState extends State<TableEvents> {
                           title: Text(event.firstName.v ?? ''),
                           subtitle: Text(event.evdate.v ?? ''),
                           trailing: const Icon(Icons.more_vert),
+                  //          onTap: () {
+                  //   int originalEventId = 0;
+                  //   String eventIdString = event.id.v?.toString() ?? '';
+                  //   if (eventIdString.isNotEmpty) {
+                  //     String truncatedId =
+                  //         eventIdString.substring(0, eventIdString.length - 1);
+                  //     int? parsedId = int.tryParse(truncatedId);
+                  //     if (parsedId != null) {
+                  //       originalEventId = parsedId;
+                  //     }
+                  //   }
+                  //   Navigator.of(context)
+                  //       .push(MaterialPageRoute(builder: (context) {
+                  //     return EventDetailsPage(
+                  //       eventId: originalEventId,
+                  //     );
+                  //   }));
+                  // },
                         ),
                       );
                     });
