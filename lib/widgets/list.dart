@@ -23,7 +23,7 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       //LOAD list of saved events
-      body: StreamBuilder<List<DbEvent?>>( 
+      body: StreamBuilder<List<DbEvent?>>(
         stream: eventsProvider.onEvents(),
         builder: (context, snapshot) {
           var events = snapshot.data;
@@ -37,18 +37,39 @@ class _ListPageState extends State<ListPage> {
           return ListView.builder(
               itemCount: EventUtils.repeatedEvents.length,
               itemBuilder: (context, index) {
-                var event = EventUtils.repeatedEvents[index]; 
+                var event = EventUtils.repeatedEvents[index];
 
                 //LIST ITEM STYLE
 
-                return ListTile(
-                  leading: Icon(Icons.cake),
-                  title: Text((event.firstName.v ?? '') + ' ' + (event.lastName.v ?? '')),
-                   visualDensity:VisualDensity(horizontal: 0, vertical: -4),
-                  subtitle: Text(DateFormat('yyyy-MM-dd').format(
-                      DateTime.parse(event.evdate.v ?? '1970-01-01'))),
-                  isThreeLine: true,
-                  trailing: Icon(Icons.more_vert),
+                // return ListTile(
+                //   leading: Icon(Icons.cake),
+                //   title: Text((event.firstName.v ?? '') + ' ' + (event.lastName.v ?? '')),
+                //    visualDensity:VisualDensity(horizontal: 0, vertical: -4),
+                //   subtitle: Text(DateFormat('yyyy-MM-dd').format(
+                //       DateTime.parse(event.evdate.v ?? '1970-01-01'))),
+                //   isThreeLine: true,
+                //   trailing: Icon(Icons.more_vert),
+                //   onTap: () {
+                //     int originalEventId = 0;
+                //     String eventIdString = event.id.v?.toString() ?? '';
+                //     if (eventIdString.isNotEmpty) {
+                //       String truncatedId =
+                //           eventIdString.substring(0, eventIdString.length - 1);
+                //       int? parsedId = int.tryParse(truncatedId);
+                //       if (parsedId != null) {
+                //         originalEventId = parsedId;
+                //       }
+                //     }
+                //     Navigator.of(context)
+                //         .push(MaterialPageRoute(builder: (context) {
+                //       return EventDetailsPage(
+                //         eventId: originalEventId,
+                //       );
+                //     }));
+                //   },
+                // )
+                ;
+                return GestureDetector(
                   onTap: () {
                     int originalEventId = 0;
                     String eventIdString = event.id.v?.toString() ?? '';
@@ -67,6 +88,63 @@ class _ListPageState extends State<ListPage> {
                       );
                     }));
                   },
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        
+
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            color: Colors.orange,
+                           // width: 50,
+                            height: 50,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(DateFormat('dd').format(DateTime.parse(
+                                    event.evdate.v ?? '1970-01-01'))),
+                                Text(DateFormat('MMM').format(DateTime.parse(
+                                    event.evdate.v ?? '1970-01-01'))),
+                                Text(DateFormat('yyyy').format(DateTime.parse(
+                                    event.evdate.v ?? '1970-01-01'))),
+                              ],
+                            ),
+                          ),
+                        ),
+                        
+
+
+                        Expanded(
+                          flex: 4, 
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text((event.firstName.v ?? '') +
+                                  ' ' +
+                                  (event.lastName.v ?? '')),
+                              Text('Item 4'),
+                            ],
+                          ),
+                        ),
+
+
+
+
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Item 5'),
+                              Text('Item 6'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               });
         },
