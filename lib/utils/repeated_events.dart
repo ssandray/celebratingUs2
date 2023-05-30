@@ -30,7 +30,8 @@ class EventUtils {
           ..firstName.v = event?.firstName.v
           ..lastName.v = event?.lastName.v
           ..evdate.v = repeatedEventDate.toString()
-          ..ideas.v = event?.ideas.v);
+          ..ideas.v = event?.ideas.v
+          ..type.v = event?.type.v);
       }
     }
 

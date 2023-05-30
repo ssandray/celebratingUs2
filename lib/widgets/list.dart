@@ -89,56 +89,104 @@ class _ListPageState extends State<ListPage> {
                     }));
                   },
                   child: Container(
-                    padding: EdgeInsets.all(8.0),
+                    //alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(left: 5, top: 3, bottom: 3),
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6.0),
+                        color: Color.fromARGB(255, 206, 206, 206)),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        
-
                         Expanded(
                           flex: 1,
                           child: Container(
-                            color: Colors.orange,
-                           // width: 50,
-                            height: 50,
+                            // alignment: Alignment.center,
+                            padding: EdgeInsets.all(1),
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 1, vertical: 1),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: Colors.orange),
+                            height: 66,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(DateFormat('dd').format(DateTime.parse(
-                                    event.evdate.v ?? '1970-01-01'))),
-                                Text(DateFormat('MMM').format(DateTime.parse(
-                                    event.evdate.v ?? '1970-01-01'))),
-                                Text(DateFormat('yyyy').format(DateTime.parse(
-                                    event.evdate.v ?? '1970-01-01'))),
+                                Text(
+                                  DateFormat('dd').format(DateTime.parse(
+                                      event.evdate.v ?? '1970-01-01')),
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  DateFormat('MMM').format(DateTime.parse(
+                                      event.evdate.v ?? '1970-01-01')),
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  DateFormat('yyyy').format(DateTime.parse(
+                                      event.evdate.v ?? '1970-01-01')),
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ],
                             ),
                           ),
                         ),
-                        
-
-
                         Expanded(
-                          flex: 4, 
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text((event.firstName.v ?? '') +
-                                  ' ' +
-                                  (event.lastName.v ?? '')),
-                              Text('Item 4'),
-                            ],
+                          flex: 4,
+                          child: Container(
+                            padding: EdgeInsets.all(1),
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 1), 
+                                height: 66,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: ShapeDecoration(
+                                        color: getColorBasedOnEventType(
+                                            event.type.v ?? ''),
+                                        shape: CircleBorder(),
+                                      ),
+                                    ),
+                                    Text(
+                                      ' #' + (event.type.v ?? ''),
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  (event.firstName.v ?? '') +
+                                      ' ' +
+                                      (event.lastName.v ?? ''),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                //Text('text'),
+                              ],
+                            ),
                           ),
                         ),
-
-
-
-
                         Expanded(
                           flex: 1,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            //  crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Item 5'),
-                              Text('Item 6'),
+                              Icon(
+                                Icons.edit_outlined,
+                                size: 15,
+                              ),
+                              SizedBox(height: 30),
+                              //Text('Item 5'),
+                              //Text('Item 6'),
                             ],
                           ),
                         ),
@@ -150,5 +198,15 @@ class _ListPageState extends State<ListPage> {
         },
       ),
     );
+  }
+
+  Color getColorBasedOnEventType(String eventType) {
+    if (eventType == 'nameday') {
+      return Colors.pink;
+    } else if (eventType == 'birthday') {
+      return Colors.blue;
+    } else {
+      return Colors.green;
+    }
   }
 }
