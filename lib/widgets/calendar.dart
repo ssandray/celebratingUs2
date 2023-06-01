@@ -7,7 +7,6 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:tekartik_app_flutter_sqflite/sqflite.dart';
 
-
 import '../widgets/list.dart';
 import '../db/events_provider.dart';
 import '../model/nameday_constant.dart';
@@ -39,7 +38,6 @@ class _TableEventsState extends State<TableEvents> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   String? _namedaysText;
-  
 
   _TableEventsState(this.eventsProvider) {
     db = eventsProvider.db!;
@@ -143,41 +141,39 @@ class _TableEventsState extends State<TableEvents> {
   @override
   Widget build(BuildContext context) {
     final kToday = DateTime.now();
-    final kFirstDay = DateTime(kToday.year -1, kToday.month, kToday.day);
-    final kLastDay = DateTime(kToday.year +1, kToday.month, kToday.day);
+    final kFirstDay = DateTime(kToday.year - 1, kToday.month, kToday.day);
+    final kLastDay = DateTime(kToday.year + 1, kToday.month, kToday.day);
 
     return Container(
       child: Column(
         children: [
           TableCalendar<DbEvent>(
             calendarBuilders: CalendarBuilders(
-             markerBuilder: (context, date, events) {
-  if (events.isNotEmpty) {
-    final List<String> eventTypes = events.map((event) => event.type.v!).toSet().toList();
-    final maxMarkers = 3; // Maximum number of markers to display
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  final List<String> eventTypes =
+                      events.map((event) => event.type.v!).toSet().toList();
+                  final maxMarkers = 3; // Maximum number of markers to display
 
-    return Align(
-      alignment: Alignment(0,0.5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: eventTypes.take(maxMarkers).map((eventType) {
-          
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(getMarkerIcon(eventType), color: getMarkerColor(eventType), size: 8),
-              
-            ],
-          );
-        }).toList(),
-      ),
-    );
-  } else {
-    return Container();
-  }
-},
-
-
+                  return Align(
+                    alignment: Alignment(0, 0.5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: eventTypes.take(maxMarkers).map((eventType) {
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(getMarkerIcon(eventType),
+                                color: getMarkerColor(eventType), size: 8),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
             ), //customize ICONS for events
             firstDay: kFirstDay,
             lastDay: kLastDay,
@@ -212,8 +208,10 @@ class _TableEventsState extends State<TableEvents> {
           Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 20),
-              child:
-                  Text(DateFormat('EEEE, dd MMM, yyyy').format(_selectedDay!))),
+              child: Text(
+                (DateFormat('EEEE, dd MMM, yyyy').format(_selectedDay!)),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              )),
 
           //Namedays for selected
           Container(
@@ -223,11 +221,14 @@ class _TableEventsState extends State<TableEvents> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
                 color: Colors.orange),
-            child: Text(_namedaysText.toString()),
+            child: Text(
+              _namedaysText.toString(),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
           ),
 
 //Celebrations for selected date
-          Flexible(
+          Container(
             child: ValueListenableBuilder<List<DbEvent>>(
               valueListenable: _selectedEvents,
               builder: (context, items, _) {
@@ -236,40 +237,140 @@ class _TableEventsState extends State<TableEvents> {
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final event = items[index];
-                      return Container(
-                        child: ListTile(
-                          leading: const Icon(Icons.cake),
-                          title: Text((event.firstName.v ?? '') + ' ' + (event.lastName.v ?? '')),
-                          subtitle: Text(event.evdate.v ?? ''),
-                          trailing: const Icon(Icons.more_vert),
-                  //          onTap: () {
-                  //   int originalEventId = 0;
-                  //   String eventIdString = event.id.v?.toString() ?? '';
-                  //   if (eventIdString.isNotEmpty) {
-                  //     String truncatedId =
-                  //         eventIdString.substring(0, eventIdString.length - 1);
-                  //     int? parsedId = int.tryParse(truncatedId);
-                  //     if (parsedId != null) {
-                  //       originalEventId = parsedId;
-                  //     }
-                  //   }
-                  //   Navigator.of(context)
-                  //       .push(MaterialPageRoute(builder: (context) {
-                  //     return EventDetailsPage(
-                  //       eventId: originalEventId,
-                  //     );
-                  //   }));
-                  // },
+                      return GestureDetector(
+                        onTap: () {
+                          int originalEventId = 0;
+                          String eventIdString = event.id.v?.toString() ?? '';
+                          if (eventIdString.isNotEmpty) {
+                            String truncatedId = eventIdString.substring(
+                                0, eventIdString.length - 1);
+                            int? parsedId = int.tryParse(truncatedId);
+                            if (parsedId != null) {
+                              originalEventId = parsedId;
+                            }
+                          }
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return EventDetailsPage(
+                              eventId: originalEventId,
+                            );
+                          }));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(left: 5, top: 3, bottom: 3),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6.0),
+                              color: Color.fromARGB(200, 221, 221, 221)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  padding: EdgeInsets.all(1),
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 1, vertical: 1),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      color: Colors.orange),
+                                  height: 66,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        DateFormat('dd').format(DateTime.parse(
+                                            event.evdate.v ?? '1970-01-01')),
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        DateFormat('MMM').format(DateTime.parse(
+                                            event.evdate.v ?? '1970-01-01')),
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        DateFormat('yyyy').format(
+                                            DateTime.parse(event.evdate.v ??
+                                                '1970-01-01')),
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: Container(
+                                  padding: EdgeInsets.all(1),
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 1),
+                                  height: 66,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: ShapeDecoration(
+                                              color: getMarkerColor(
+                                                  event.type.v ?? ''),
+                                              shape: CircleBorder(),
+                                            ),
+                                          ),
+                                          Text(
+                                            ' #' + (event.type.v ?? ''),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        (event.firstName.v ?? '') +
+                                            ' ' +
+                                            (event.lastName.v ?? ''),
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.edit_outlined,
+                                      size: 15,
+                                    ),
+                                    SizedBox(height: 30),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     });
               },
             ),
           ),
+          SizedBox(height: 20),
           Container(
               alignment: Alignment.topLeft,
               padding: const EdgeInsets.only(left: 20),
-              child: const Text('Upcoming celebrations')),
+              child: const Text('Upcoming celebrations',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
           Flexible(child: ListPage()),
         ],
       ),
@@ -277,29 +378,28 @@ class _TableEventsState extends State<TableEvents> {
   }
 
   IconData getMarkerIcon(String eventType) {
-  switch (eventType) {
-    case 'nameday':
-      return Icons.circle;
-    case 'birthday':
-      return Icons.circle;
-    case 'other':
-      return Icons.circle;
-    default:
-      return Icons.circle;
+    switch (eventType) {
+      case 'nameday':
+        return Icons.circle;
+      case 'birthday':
+        return Icons.circle;
+      case 'other':
+        return Icons.circle;
+      default:
+        return Icons.circle;
+    }
   }
-}
 
-Color getMarkerColor(String eventType) {
-  switch (eventType) {
-    case 'nameday':
-      return Colors.pink;
-    case 'birthday':
-      return Colors.blue;
-    case 'other':
-      return Colors.green;
-    default:
-      return Colors.grey;
+  Color getMarkerColor(String eventType) {
+    switch (eventType) {
+      case 'nameday':
+        return Colors.pink;
+      case 'birthday':
+        return Colors.blue;
+      case 'other':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
-}
-
 }

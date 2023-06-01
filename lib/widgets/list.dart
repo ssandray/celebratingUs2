@@ -39,36 +39,7 @@ class _ListPageState extends State<ListPage> {
               itemBuilder: (context, index) {
                 var event = EventUtils.repeatedEvents[index];
 
-                //LIST ITEM STYLE
-
-                // return ListTile(
-                //   leading: Icon(Icons.cake),
-                //   title: Text((event.firstName.v ?? '') + ' ' + (event.lastName.v ?? '')),
-                //    visualDensity:VisualDensity(horizontal: 0, vertical: -4),
-                //   subtitle: Text(DateFormat('yyyy-MM-dd').format(
-                //       DateTime.parse(event.evdate.v ?? '1970-01-01'))),
-                //   isThreeLine: true,
-                //   trailing: Icon(Icons.more_vert),
-                //   onTap: () {
-                //     int originalEventId = 0;
-                //     String eventIdString = event.id.v?.toString() ?? '';
-                //     if (eventIdString.isNotEmpty) {
-                //       String truncatedId =
-                //           eventIdString.substring(0, eventIdString.length - 1);
-                //       int? parsedId = int.tryParse(truncatedId);
-                //       if (parsedId != null) {
-                //         originalEventId = parsedId;
-                //       }
-                //     }
-                //     Navigator.of(context)
-                //         .push(MaterialPageRoute(builder: (context) {
-                //       return EventDetailsPage(
-                //         eventId: originalEventId,
-                //       );
-                //     }));
-                //   },
-                // )
-                ;
+//LIST ITEMS
                 return GestureDetector(
                   onTap: () {
                     int originalEventId = 0;
@@ -89,19 +60,17 @@ class _ListPageState extends State<ListPage> {
                     }));
                   },
                   child: Container(
-                    //alignment: Alignment.centerLeft,
                     padding: EdgeInsets.only(left: 5, top: 3, bottom: 3),
                     margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6.0),
-                        color: Color.fromARGB(255, 206, 206, 206)),
+                        color: Color.fromARGB(200, 221, 221, 221)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
                           flex: 1,
                           child: Container(
-                            // alignment: Alignment.center,
                             padding: EdgeInsets.all(1),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 1, vertical: 1),
@@ -163,9 +132,7 @@ class _ListPageState extends State<ListPage> {
                                   ],
                                 ),
                                 Text(
-                                  (event.firstName.v ?? '') +
-                                      ' ' +
-                                      (event.lastName.v ?? ''),
+                                  (event.firstName.v ?? '') + ' ' + (event.lastName.v ?? ''),
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
@@ -178,16 +145,13 @@ class _ListPageState extends State<ListPage> {
                         Expanded(
                           flex: 1,
                           child: Column(
-                            //  crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                              children: const [
                               Icon(
                                 Icons.edit_outlined,
                                 size: 15,
                               ),
                               SizedBox(height: 30),
-                              //Text('Item 5'),
-                              //Text('Item 6'),
-                            ],
+                             ],
                           ),
                         ),
                       ],
