@@ -175,6 +175,8 @@ class _TableEventsState extends State<TableEvents> {
                 }
               },
             ), //customize ICONS for events
+            headerStyle: HeaderStyle(titleCentered: true),
+            rowHeight: 40,
             firstDay: kFirstDay,
             lastDay: kLastDay,
             focusedDay: _focusedDay,
@@ -183,9 +185,15 @@ class _TableEventsState extends State<TableEvents> {
             calendarFormat: _calendarFormat,
             eventLoader: _getEventsForDay,
             startingDayOfWeek: StartingDayOfWeek.monday,
-            calendarStyle: const CalendarStyle(
+            calendarStyle:  CalendarStyle(
+                
                 // Use `CalendarStyle` to customize the UI
-                outsideDaysVisible: false,
+                
+                selectedDecoration: BoxDecoration(color: Colors.orange,
+            shape: BoxShape.circle),
+            todayDecoration: BoxDecoration(color: Color.fromARGB(123, 255, 153, 0), shape: BoxShape.circle ),
+                outsideDaysVisible: true,
+                
                 tableBorder: TableBorder(
                     bottom: BorderSide(
                         color: Colors.orange, style: BorderStyle.solid)),
