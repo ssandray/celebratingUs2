@@ -31,7 +31,7 @@ Future main() async {
   // devPrint('/notepad Starting');
   await eventsProvider.ready;
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,      //LOCK to PORTRAIT MODE
+    DeviceOrientation.portraitUp, //LOCK to PORTRAIT MODE
     DeviceOrientation.portraitDown,
   ]);
   runApp(MyApp());
@@ -101,20 +101,42 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         body: _children[_currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: onTabTapped,
-            items: [
-              (BottomNavigationBarItem(
-                  label: 'Calendar', icon: Icon(Icons.calendar_month))),
-              (BottomNavigationBarItem(label: 'List', icon: Icon(Icons.star))),
-            ]),
+        bottomNavigationBar: Container(
+          height: 68,
+          child: Container(
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              iconSize: 30,
+              backgroundColor: Colors.black,
+              selectedItemColor: Colors.orange, // Color when item is selected
+              unselectedItemColor:
+                  Colors.white, // Color when item is not selected
+              showUnselectedLabels: true,
+              unselectedLabelStyle:
+                  TextStyle(color: Colors.white), // Unselected label color
+              selectedLabelStyle:
+                  TextStyle(color: Colors.orange), // Selected label color
+              currentIndex: _currentIndex,
+              onTap: onTabTapped,
+              items: const [
+                (BottomNavigationBarItem(
+                    label: 'Calendar', icon: Icon(Icons.calendar_month_rounded))),
+                (BottomNavigationBarItem(
+                    label: 'List', icon: Icon(Icons.star_border))),
+              ],
+            ),
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              _showPopupDialog(context);
-            }));
+        floatingActionButton: Container(
+          width: 72,
+          height: 72,
+          child: FloatingActionButton(
+              child: Icon(Icons.add, size: 45),
+              onPressed: () {
+                _showPopupDialog(context);
+              }),
+        ));
   }
 
   void _showPopupDialog(BuildContext context) {
@@ -185,11 +207,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
                       return EditEventPage(
-                        initialEvent: null,
-                        typeTitle: 'New Celebration',
-                        backgroundColor: Colors.green,
-                        type: 'other'
-                      );
+                          initialEvent: null,
+                          typeTitle: 'New Celebration',
+                          backgroundColor: Colors.green,
+                          type: 'other');
                     })).then((value) => Navigator.pop(context));
                   },
                   child: Row(
