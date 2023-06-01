@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
       ),
       home: MyHomePage(
-        title: 'Celebrating Us', //HEADER TITLE
+        title: 'Calendar', //HEADER TITLE
       ),
     );
   }
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -73,9 +73,12 @@ class _MyHomePageState extends State<MyHomePage> {
     Placeholder(),
   ];
 
+List<String> _tabLabels = ['Calendar', 'List of celebrations'];
+
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      widget.title = _tabLabels[_currentIndex];
     });
   }
 
@@ -97,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // Refresh the screen to reflect any changes made in the settings
                   setState(() {});
                 },
-                icon: Icon(Icons.settings)),
+                icon: Icon(Icons.settings_outlined)),
           ],
         ),
         body: _children[_currentIndex],
@@ -228,4 +231,12 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
+  final List<String> bottomNavigationBarLabels = [
+  'Calendar',
+  'List',
+];
+String getSelectedLabel() {
+  return bottomNavigationBarLabels[_currentIndex];
+}
 }

@@ -238,24 +238,24 @@ class _TableEventsState extends State<TableEvents> {
                     itemBuilder: (context, index) {
                       final event = items[index];
                       return GestureDetector(
-                        onTap: () {
-                          int originalEventId = 0;
-                          String eventIdString = event.id.v?.toString() ?? '';
-                          if (eventIdString.isNotEmpty) {
-                            String truncatedId = eventIdString.substring(
-                                0, eventIdString.length - 1);
-                            int? parsedId = int.tryParse(truncatedId);
-                            if (parsedId != null) {
-                              originalEventId = parsedId;
-                            }
-                          }
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return EventDetailsPage(
-                              eventId: originalEventId,
-                            );
-                          }));
-                        },
+                        // onTap: () {
+                        //   int originalEventId = 0;
+                        //   String eventIdString = event.id.v?.toString() ?? '';
+                        //   if (eventIdString.isNotEmpty) {
+                        //     String truncatedId = eventIdString.substring(
+                        //         0, eventIdString.length - 1);
+                        //     int? parsedId = int.tryParse(truncatedId);
+                        //     if (parsedId != null) {
+                        //       originalEventId = parsedId;
+                        //     }
+                        //   }
+                        //   Navigator.of(context)
+                        //       .push(MaterialPageRoute(builder: (context) {
+                        //     return EventDetailsPage(
+                        //       eventId: originalEventId,
+                        //     );
+                        //   }));
+                        // },
                         child: Container(
                           padding: EdgeInsets.only(left: 5, top: 3, bottom: 3),
                           margin:
@@ -349,10 +349,10 @@ class _TableEventsState extends State<TableEvents> {
                                 flex: 1,
                                 child: Column(
                                   children: [
-                                    Icon(
-                                      Icons.edit_outlined,
-                                      size: 15,
-                                    ),
+                                    // Icon(
+                                    //   Icons.edit_outlined,
+                                    //   size: 15,
+                                    // ),
                                     SizedBox(height: 30),
                                   ],
                                 ),
